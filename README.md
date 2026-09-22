@@ -9,6 +9,7 @@
 ## 🤖 Mandatory Notice for All AI Agents & Subagents
 > 🚨 **QUEUE PROTOCOL:** If you are an AI assistant, subagent, or fresh agent session entering this workspace, **you MUST thoroughly review [AGENTS.md](./AGENTS.md) and the 7 chunk specifications before taking action.** Do not make generic e-commerce assumptions.
 * **👉 [AGENTS.md](./AGENTS.md)** — Master onboarding, rules, and system ground truth.
+* **👉 [CHECKPOINTS.md](./CHECKPOINTS.md)** — **Live state tracker & multi-agent execution board.**
 * **👉 [CONTEXT.md](./CONTEXT.md)** — Fast project summary pointer.
 * **👉 [EVM-SYSTEM-LIMITATIONS-AND-SHORTCOMINGS.md](./EVM-SYSTEM-LIMITATIONS-AND-SHORTCOMINGS.md)** — 12 system shortcomings ranked by business harm.
 

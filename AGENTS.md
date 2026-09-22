@@ -81,10 +81,37 @@ The solution is strictly architected into 7 modular chunks. Every agent working 
 * [EVM-PROPOSAL-V1.md](./EVM-PROPOSAL-V1.md) — Client-facing proposal.
 * [QUESTIONNAIRE-FOR-PRASHANT.md](./QUESTIONNAIRE-FOR-PRASHANT.md) — Initial discovery questionnaire.
 * [README.md](./README.md) — Repository master index.
+* [CHECKPOINTS.md](./CHECKPOINTS.md) — Live state tracking & multi-agent concurrency matrix.
 
 ---
 
-## 5. Technical Stack & Infrastructure Decisions
+## 5. Parallel Execution & Multi-Agent Checkpoint Protocol
+
+> ⚡ **CRITICAL PROTOCOL FOR MULTI-AGENT / CONCURRENT DEVELOPMENT:**  
+> Rishav and Shyam (and their respective AI agents) frequently work on different chunks in parallel.  
+> **Scenario:** Rishav + Agent is building **Chunk 2** (Demand Intelligence). Simultaneously, Shyam + Agent is building **Chunk 3** (Working Capital Intelligence).
+
+### The Concurrency Rules for Agents:
+1. **Consult [CHECKPOINTS.md](./CHECKPOINTS.md) on Every Session Start:**
+   * `CHECKPOINTS.md` is the single source of truth for execution state.
+   * Check what is `COMPLETED`, what is `IN_PROGRESS` (locked), and what is `PENDING`.
+2. **Never Duplicate In-Progress Work:**
+   * If another agent/engineer has marked a chunk `IN_PROGRESS`, do not write competing code.
+3. **Fast Verification & Skipping Ahead:**
+   * When you finish your assigned chunk (e.g., Chunk 2), check `CHECKPOINTS.md`.
+   * If the next logical chunk (e.g., Chunk 3) is ALREADY marked `COMPLETED` by your teammate:
+     1. Inspect the deliverables listed in `CHECKPOINTS.md`.
+     2. Run the quick verification command (e.g. `npx tsx scripts/verify-...`).
+     3. Mark it `VERIFIED` in the matrix.
+     4. **Immediately jump directly to Chunk 4, Chunk 5, or Chunk 6.** Do not re-implement or stall.
+4. **Claiming (Locking) a Chunk:**
+   * Before writing code, edit `CHECKPOINTS.md`: set status to `IN_PROGRESS`, specify your worker tag (e.g. `Rishav + Agent`), and commit.
+5. **Signing Off:**
+   * When finished, run your verification script, record deliverables in `CHECKPOINTS.md`, mark as `COMPLETED`, and push.
+
+---
+
+## 6. Technical Stack & Infrastructure Decisions
 
 * **Cloud Infrastructure:** **Amazon Web Services (AWS)** — Rishav has active AWS promotional credits.
   * **Database:** AWS RDS PostgreSQL (stores time-series sales, DRR records, recommendations, audit logs).
