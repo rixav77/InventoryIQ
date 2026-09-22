@@ -9,11 +9,17 @@
 
 ## 1. Static MSL Formula in a Hyper-Volatile E-Commerce Environment 🔴 [CRITICAL — CORE PAIN POINT]
 * **Current State:**
-  $$\text{MSL} = \left(\frac{\text{MSP}}{30}\right) \times \text{PT}$$
-  $$\text{ROL} = \max(\text{MSL}, \text{MOQ})$$
-  $$\text{ROQ} = \text{Open PO} + \text{In-transit} + \text{Stock} - \text{ROL}$$
-  $$\text{Action} = \text{REORDER NOW when } \text{Stock} + \text{Open PO} + \text{In-transit} < \text{ROL}$$
-  *$\text{MSP}$ (Monthly Selling Plan) is a manually typed constant, typically reviewed only quarterly.*
+  $$\mathbf{Minimum\ Stock\ Level\ (MSL)} = \left(\frac{\mathbf{Monthly\ Selling\ Plan\ (MSP)}}{30\ \text{Days}}\right) \times \mathbf{Procurement\ Time\ (PT\ in\ Days)}$$
+  $$\mathbf{Reorder\ Level\ (ROL)} = \max\Big(\mathbf{Minimum\ Stock\ Level\ (MSL)},\ \mathbf{Minimum\ Order\ Quantity\ (MOQ)}\Big)$$
+  $$\mathbf{Reorder\ Quantity\ (ROQ)} = \mathbf{Open\ Purchase\ Orders} + \mathbf{In\text{-}Transit\ Stock} + \mathbf{Current\ Physical\ Stock} - \mathbf{Reorder\ Level\ (ROL)}$$
+  $$\mathbf{Action} = \mathbf{REORDER\ NOW} \quad \text{when } (\mathbf{Current\ Physical\ Stock} + \mathbf{Open\ Purchase\ Orders} + \mathbf{In\text{-}Transit\ Stock}) < \mathbf{Reorder\ Level\ (ROL)}$$
+  * $\text{MSP}$ ($\text{Monthly Selling Plan}$): Planned monthly sales or target inward volume (manually typed).
+  * $\text{PT}$ ($\text{Procurement Time}$): Expected supplier production and delivery turnaround in calendar days.
+  * $\text{MOQ}$ ($\text{Minimum Order Quantity}$): Lowest quantity supplier will manufacture per order.
+  * $\text{ROL}$ ($\text{Reorder Level}$): Inventory threshold below which a reorder is triggered.
+  * $\text{ROQ}$ ($\text{Reorder Quantity}$): Net balance of pipeline versus requirement.
+  * $\text{Open Purchase Orders} = \text{Tally Outstanding PO Total} - \text{In-Transit Shipments}$.
+  * $\text{Available Stock} = \text{Current Stock} - \text{Allocated Reserved Stock}$.
 * **The Flaw:**
   E-commerce Daily Run Rate ($\text{DRR}$) is dynamic. Baseline sales of 100 units/day regularly jump to 120–200+ units/day during festival flash sales (Amazon Great Indian Festival, Flipkart Big Billion Days, Prime Day, Republic Day sales). A static formula cannot anticipate spikes or taper off after sales.
 * **Harm & Business Impact:**

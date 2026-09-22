@@ -26,9 +26,12 @@ EVM currently manages procurement through an internal web app called **Procura**
 * **Channel / General Trade (GT) Demand is Stable:** Goods sent to offline distributors and retail stores have predictable, quarterly buying patterns. Their current static minimum stock level formula works fine for offline.
 * **E-Commerce Demand is Hyper-Volatile:** On Amazon India, Flipkart, and D2C, the Daily Run Rate ($\text{DRR}$) swings wildly. Baseline demand of 100 units/day surges to 120–200+ units/day during festival flash sales (Amazon Great Indian Festival, Flipkart Big Billion Days).
 * **Current Procura Formula is Static:**
-  $$\text{MSL} = \left(\frac{\text{MSP}}{30}\right) \times \text{PT} \quad \Big| \quad \text{ROL} = \max(\text{MSL}, \text{MOQ})$$
-  $$\text{ROQ} = \text{Open PO} + \text{In-transit} + \text{Stock} - \text{ROL}$$
+  $$\mathbf{Minimum\ Stock\ Level\ (MSL)} = \left(\frac{\mathbf{Monthly\ Selling\ Plan\ (MSP)}}{30\ \text{Days}}\right) \times \mathbf{Procurement\ Time\ (PT\ in\ Days)}$$
+  $$\mathbf{Reorder\ Level\ (ROL)} = \max\Big(\mathbf{Minimum\ Stock\ Level\ (MSL)},\ \mathbf{Minimum\ Order\ Quantity\ (MOQ)}\Big)$$
+  $$\mathbf{Reorder\ Quantity\ (ROQ)} = \mathbf{Open\ Purchase\ Orders} + \mathbf{In\text{-}Transit\ Stock} + \mathbf{Current\ Stock\ on\ Hand} - \mathbf{Reorder\ Level\ (ROL)}$$
+  $$\mathbf{Action} = \mathbf{REORDER\ NOW} \quad \text{when} \quad (\mathbf{Current\ Stock} + \mathbf{Open\ PO} + \mathbf{In\text{-}Transit}) < \mathbf{Reorder\ Level\ (ROL)}$$
   * $\text{MSP}$ (Monthly Selling Plan) is typed in manually and rarely changes.
+  * $\text{PT}$ (Procurement Time) is assumed to be a fixed 30 or 60 days, ignoring massive supplier delivery delays.
   * **Safety Stock ($\text{SS}$) is hardcoded to ZERO across all 717 SKUs.**
   * E-commerce has **no separate, dedicated MSL** (one flat number for both channel and e-com).
 * **The Consequences:**

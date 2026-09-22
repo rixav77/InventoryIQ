@@ -7,57 +7,78 @@
 
 ## Problem Statement
 
-EVM's current MSL formula is **static**:
+## 1. EVM's Current Formula (Fully Unabbreviated)
 
-```
-MSL = (MSP / 30) × PT
-ROL = max(MSL, MOQ)
-ROQ = Open PO + Intransit + Stock - ROL
-Action = REORDER NOW when Stock + Open PO + Intransit < ROL
-```
+Directly transcribed from EVM's live Procura formula screens (`formula.png` and `formula2.0.png`):
 
-**MSP (Monthly Selling Plan)** is manually set once and stays fixed for months. This works for **channel/GT** (offline distribution) where demand is predictable. But for **e-commerce**, DRR swings from 100 → 200 during sales, and the static MSP doesn't react.
-
-### What Breaks
-
-| Scenario | Static MSL Behavior | What Should Happen |
-|---|---|---|
-| Flash sale approaching (BBDD, GIF) | MSL stays at 100/day equivalent | MSL should spike to 180/day equivalent 10 days before |
-| Sale underperforms expectations | MSL stays inflated | MSL should reduce mid-sale to prevent overstocking |
-| New product launch goes viral | MSL set to conservative forecast | MSL should ramp up based on actual DRR trajectory |
-| Post-sale normalization | MSL remains at sale levels | MSL should taper down to trailing 14-day average |
-| Seasonal decline (e.g., Q1 post-Diwali) | MSL stays at Q3/Q4 levels | MSL should auto-reduce based on seasonal patterns |
+### Formula 1: Minimum Stock Level (MSL)
+$$\mathbf{Minimum\ Stock\ Level\ (MSL)} = \left( \frac{\mathbf{Monthly\ Selling\ Plan\ (MSP)}}{30\ \text{Days}} \right) \times \mathbf{Procurement\ Time\ (in\ Days)}$$
+* **$\text{Monthly Selling Plan (MSP)}$:** Planned sales target or expected inward units for the entire 30-day month (manually typed by the product team).
+* **$\frac{\text{Monthly Selling Plan}}{30}$:** Derived planned sales velocity per day (units/day).
+* **$\text{Procurement Time (PT)}$:** Quoted supplier manufacturing & delivery lead time in calendar days (typically 30 or 60 days).
 
 ---
 
-## Solution: Dynamic MSL Formula
+### Formula 2: Reorder Level (ROL)
+$$\mathbf{Reorder\ Level\ (ROL)} = \max\Big( \mathbf{Minimum\ Stock\ Level\ (MSL)},\ \mathbf{Minimum\ Order\ Quantity\ (MOQ)} \Big)$$
+* If $\text{Minimum Stock Level}$ is 400 units, but supplier's $\text{Minimum Order Quantity}$ is 1,000 units, the system floors the reorder threshold at 1,000 units.
 
-Replace the static `MSP/30` with a **demand-responsive Daily Run Rate (DRR)** calculation.
+---
 
-### New Formula
+### Formula 3: Reorder Quantity (ROQ) / Net Stock Position
+$$\mathbf{Reorder\ Quantity\ (ROQ)} = \mathbf{Open\ Purchase\ Orders} + \mathbf{In\text{-}Transit\ Stock} + \mathbf{Current\ Stock\ on\ Hand} - \mathbf{Reorder\ Level\ (ROL)}$$
+* A **negative ROQ** indicates an inventory deficit (you are below the reorder point).
+* A **positive ROQ** indicates a surplus (you hold excess inventory above the reorder point).
 
-```
-Dynamic_DRR = α × DRR_7d + β × DRR_14d + γ × DRR_30d + δ × Event_Multiplier
+---
 
-where:
-  α + β + γ = 1.0 (weights summing to 1)
-  α = 0.5 (heavy recent bias)
-  β = 0.3
-  γ = 0.2
-  δ = event-specific multiplier (1.0 = no event, 1.5-3.0 = sale event)
+### Formula 4: Action Status / Reorder Trigger
+$$\mathbf{Action} = \begin{cases} 
+\mathbf{REORDER\ NOW} & \text{if } \Big(\mathbf{Current\ Stock\ on\ Hand} + \mathbf{Open\ Purchase\ Orders} + \mathbf{In\text{-}Transit\ Stock}\Big) < \mathbf{Reorder\ Level\ (ROL)} \\
+\mathbf{OK} & \text{otherwise}
+\end{cases}$$
 
-Dynamic_MSL = Dynamic_DRR × PT × Service_Level_Buffer
+---
 
-where:
-  PT = Procurement Time (days) — from EVM's existing data
-  Service_Level_Buffer = 1.0 + (Z × σ_DRR / DRR_avg)
-    Z = Z-score for target service level (1.65 for 95%, 2.33 for 99%)
-    σ_DRR = standard deviation of daily run rate
-```
+### Supporting Sub-Formulas Used Across EVM Screens:
+* **True Open Purchase Orders (Pipeline Reconciliation from `Open_PO_which_are_in_pipeline.png`):**
+  $$\mathbf{True\ Open\ Purchase\ Orders} = \mathbf{Tally\ Outstanding\ Purchase\ Order\ Total} - \mathbf{Total\ In\text{-}Transit\ Shipments}$$
+* **Available Stock (CRM Inventory Reservation from `hundia_stock_summary_2.0.png`):**
+  $$\mathbf{Available\ Stock} = \mathbf{Current\ Physical\ Stock\ in\ Warehouse} - \mathbf{Allocated\ Reserved\ Stock}$$
 
-### Channel-Level Split
+---
 
-Even though EVM currently has ONE combined e-com MSL, we build for **per-channel MSL** from day one:
+## 2. Why This Breaks in E-Commerce
+* **$\text{Monthly Selling Plan (MSP)}$ is static:** It is typed once and rarely touched for months.
+* **Safety Stock ($\text{SS}$) is literally $0$:** The column exists in Procura, but EVM leaves it hardcoded to zero across all 717 SKUs.
+* **$\text{Procurement Time}$ is assumed fixed:** The formula assumes suppliers always deliver in exactly 30 days, ignoring real-world customs and factory delays (POs currently up to 78 days overdue).
+
+---
+
+## 3. Our Dynamic E-Commerce MSL Solution (Fully Unabbreviated)
+
+We replace the static manual $\frac{\text{Monthly Selling Plan}}{30}$ with an empirical **Dynamic Daily Run Rate (Dynamic DRR)** and replace zero safety stock with a **Statistical Safety Buffer**:
+
+### Step 1: Dynamic Daily Run Rate (DRR) Calculation
+$$\mathbf{Dynamic\ Daily\ Run\ Rate} = \Bigg[ \Big(0.50 \times \mathbf{DRR}_{\text{Trailing 7 Days}}\Big) + \Big(0.30 \times \mathbf{DRR}_{\text{Trailing 14 Days}}\Big) + \Big(0.20 \times \mathbf{DRR}_{\text{Trailing 30 Days}}\Big) \Bigg] \times \mathbf{Event\ Multiplier}$$
+* **$\text{DRR}_{\text{Trailing 7 Days}}$:** Moving average sales velocity per day over the last 7 calendar days (highest weight for fast market shifts).
+* **$\text{DRR}_{\text{Trailing 14 Days}}$:** Moving average sales velocity per day over the last 14 calendar days (stabilizer).
+* **$\text{DRR}_{\text{Trailing 30 Days}}$:** Moving average sales velocity per day over the last 30 calendar days (baseline trend).
+* **$\text{Event Multiplier}$:** Expected demand spike factor for upcoming sales (e.g., $1.0\times$ normal, $1.8\times$ for Flipkart Big Billion Days, $2.1\times$ for Amazon Great Indian Festival).
+
+---
+
+### Step 2: Statistical Safety Stock (SS)
+$$\mathbf{Safety\ Stock} = Z_{\text{Service Level}} \times \sqrt{\left( \mathbf{Actual\ Average\ Lead\ Time} \times \sigma^2_{\text{Daily Demand}} \right) + \left( \mathbf{Average\ Daily\ Run\ Rate}^2 \times \sigma^2_{\text{Lead Time}} \right)}$$
+* **$Z_{\text{Service Level}}$:** Statistical confidence factor ($1.65$ for 95% service level / 5% stockout risk, $2.33$ for 99% service level on top-tier revenue SKUs).
+* **$\sigma_{\text{Daily Demand}}$:** Standard deviation of daily e-commerce order units over trailing 90 days (demand volatility).
+* **$\mathbf{Actual\ Average\ Lead\ Time}$:** Historical measured calendar days from Purchase Order placement to Warehouse Goods Receipt (replacing static quoted Procurement Time).
+* **$\sigma_{\text{Lead Time}}$:** Standard deviation of actual vendor delivery times (supplier unreliability buffer).
+
+---
+
+### Step 3: Final Dynamic MSL Formula
+$$\mathbf{Dynamic\ Minimum\ Stock\ Level\ (Dynamic\ MSL)} = \Big( \mathbf{Dynamic\ Daily\ Run\ Rate} \times \mathbf{Actual\ Average\ Lead\ Time} \Big) + \mathbf{Safety\ Stock}$$
 
 ```
 E-com MSL (total) = Amazon_MSL + Flipkart_MSL + D2C_MSL + Buffer
