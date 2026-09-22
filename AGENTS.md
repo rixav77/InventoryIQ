@@ -8,9 +8,8 @@
 
 ## 1. Quick Identity & Stakeholder Map
 
-* **The Engineering Team (Axiom Labs — `axiomlabs.live`):**
-  * **Rishav Kumar** (`rixav77`): Founder / Lead Engineer at Axiom Labs.
-  * **Shyam**: Engineer at Axiom Labs, co-building and collaborating on InventoryIQ.
+* **The Leadership & Engineering Team (Axiom Labs — `axiomlabs.live`):**
+  * **Rishav Kumar** (`rixav77`) & **Shyam**: Co-Founders & Lead Engineers at Axiom Labs (equal partners leading engineering & product).
 * **The Client:** **EVM Zone** (`evmzone.com`) / **Hundia Info Solutions Pvt. Ltd.** (leading Indian consumer electronics & IT peripheral manufacturer — SSDs, DRAM, motherboards, power banks, cabinets, accessories).
 * **Client Key Contact:**
   * **Prashant Jain:** Lead of IT, Systems & Automation at EVM. Conducted the live product screenshare walkthrough on 22 September 2026.

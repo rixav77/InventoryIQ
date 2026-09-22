@@ -4,7 +4,7 @@
 > **👉 [AGENTS.md](file:///Users/apple/Documents/evmzone/InventoryIQ/AGENTS.md)**
 
 ## One-Minute Project Summary
-* **Engineering Team:** **Rishav Kumar** (`rixav77`) & **Shyam** — Engineers at **Axiom Labs** (`axiomlabs.live`).
+* **Founders & Engineering Leadership:** **Rishav Kumar** (`rixav77`) & **Shyam** — Co-Founders & Lead Engineers at **Axiom Labs** (`axiomlabs.live`).
 * **Client:** EVM Zone (`evmzone.com`) / Hundia Info Solutions Pvt Ltd.
 * **Lead Contact:** Prashant Jain (IT & Automation Lead, EVM).
 * **Core Problem:** EVM has an advanced internal procurement tool ("Procura") but its MSL formula is static (`MSL = MSP/30 * PT`) with hardcoded zero safety stock. Offline/Channel demand is stable quarterly, but E-Commerce Daily Run Rate (DRR) swings from 100 to 200+ during festival flash sales.

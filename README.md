@@ -1,7 +1,7 @@
 # InventoryIQ — Intelligent Dynamic MSL & Capital Optimizer
 
 > **Built for EVM Zone / Hundia Info Solutions Pvt. Ltd.**  
-> **Engineering Team:** Rishav Kumar & Shyam — **Axiom Labs** (`axiomlabs.live`)  
+> **Engineering Leadership:** Rishav Kumar & Shyam — Co-Founders at **Axiom Labs** (`axiomlabs.live`)  
 > **Target Prototype Delivery:** 24–25 September 2026 (2–3 days from 22 Sep call)
 
 ---
