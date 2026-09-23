@@ -16,7 +16,7 @@
 | **CHUNK-3: Working Capital** | Surplus alerts (>30/60/90d), capital-at-risk, dead stock, MOQ trap | `COMPLETED` | Rishav + Agent | `92fc31d` | Awaiting peer verification | Feeds CFO alerts |
 | **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `COMPLETED` | Rishav + Agent | `63051e6` | Awaiting peer verification | V2 logistics |
 | **CHUNK-5: Integration Layer** | EasyEcom CSV/API adapter, Procura schemas, pipeline reconciliation | `COMPLETED` | Rishav + Agent | `86db0fb` | Awaiting peer verification | V1 live sync |
-| **CHUNK-6: Dashboard & Alerts** | Health overview table, SKU deep-dive, DRR charts, approval flow | `IN_PROGRESS` | Rishav + Agent | `feat/chunk-4-transfer-intelligence` | — | Client prototype |
+| **CHUNK-6: Dashboard & Alerts** | Health overview table, SKU deep-dive, DRR charts, approval flow | `COMPLETED` | Rishav + Agent | `feat/chunk-4-transfer-intelligence` | Awaiting peer verification | Client prototype |
 | **CHUNK-7: Vendor Intelligence** | Multi-vendor price comparison ($11.99 vs $13.30), OTIF scoring | `PENDING` | Unassigned | `main` | — | V1 procurement |
 | **MILESTONE: 2-3 Day Prototype** | Top 20-50 SKUs running dynamic MSL vs static MSL with mock/CSV feed | `PENDING` | Rishav & Shyam | `main` | — | Target: 24-25 Sep |
 
@@ -211,14 +211,30 @@ When you finish code:
 ---
 
 ### CHUNK-6: Dashboard & Alerts
-* **Status:** `IN_PROGRESS`
+* **Status:** `COMPLETED` (awaiting peer verification)
+* **Completed:** 23 Sep 2026
 * **Owner:** Rishav + Agent (`feat/chunk-4-transfer-intelligence`)
-* **Target Deliverables:**
-  * React/Vite web application: `packages/frontend/`
-  * Dynamic MSL vs Static MSL comparison table
-  * SKU deep-dive drawer with DRR charts & reasoning
-  * Approval workflow action triggers (Approve / Modify / Reject)
-* **Verification Command:** `cd packages/frontend && npm run build`
+* **Deliverables:**
+  * React + Vite dashboard consuming the live `@inventoryiq/core` engine source: `packages/frontend/`
+  * MSL health overview table with static vs dynamic MSL, action, and band columns: `packages/frontend/src/components/SkuTable.tsx`
+  * SKU deep dive with DRR line chart and static-vs-dynamic MSL bar chart (Recharts): `packages/frontend/src/components/SkuDeepDive.tsx`
+  * Approve / Dismiss recommendation workflow: `packages/frontend/src/components/RecommendationList.tsx`
+  * Deterministic data layer (static MSL, dynamic MSL, safety stock, surplus capital): `packages/frontend/src/data/dashboard-data.ts`
+  * Vite resolver plugin mapping the engine's NodeNext `.js` specifiers to `.ts` source: `packages/frontend/vite.config.ts`
+* **Verification Commands:**
+  * `npm run typecheck`
+  * `cd packages/frontend && npm run build`
+  * `npm run test:chunk-1`
+  * `npm run test:chunk-2`
+  * `npm run test:chunk-3`
+  * `npm run test:chunk-4`
+  * `npm run test:chunk-5`
+  * `npm run verify:chunk-1`
+  * `npm run verify:chunk-2`
+  * `npm run verify:chunk-3`
+  * `npm run verify:chunk-4`
+  * `npm run verify:chunk-5`
+* **Verification Result:** `tsc --noEmit` and `vite build` both pass; the dashboard bundles the engine (Chunks 1-5) and renders the 8-SKU MSL comparison. Prototype scope only: WhatsApp/email alerts, auth, sale-event calendar, and Procura write-back are deferred to V1. Styling uses hand-written CSS rather than TailwindCSS to avoid an additional build dependency in the prototype.
 
 ---
 
