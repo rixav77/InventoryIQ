@@ -10,8 +10,10 @@
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test:chunk-1": "tsx packages/core/src/tests/test-msl-engine.ts",
     "test:chunk-2": "tsx packages/core/src/tests/test-demand-intel.ts",
+    "test:chunk-3": "tsx packages/core/src/tests/test-working-capital.ts",
     "verify:chunk-1": "tsx scripts/verify-chunk-1.ts",
-    "verify:chunk-2": "tsx scripts/verify-chunk-2.ts"
+    "verify:chunk-2": "tsx scripts/verify-chunk-2.ts",
+    "verify:chunk-3": "tsx scripts/verify-chunk-3.ts"
   },
   "devDependencies": {
     "@types/node": "^24.5.2",

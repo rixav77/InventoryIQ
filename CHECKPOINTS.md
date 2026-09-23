@@ -13,7 +13,7 @@
 | **P0: Documentation & Analysis** | Specs, 12 flaws, 25 screenshots, master context | `COMPLETED` | Rishav + Antigravity | `dd0ca54` | Verified | Unlocks all Chunks |
 | **CHUNK-1: Dynamic MSL Engine** | Rolling DRR (7/14/30d), event multipliers, dynamic MSL formula | `COMPLETED` | Rishav + Agent | `853195e` | Awaiting peer verification | Unlocks Chunk 6 UI |
 | **CHUNK-2: Demand Intelligence** | Statistical SS formula, ABC/XYZ classifier, seasonality, RTO model | `COMPLETED` | Rishav + Agent | `902fc4c` | Awaiting peer verification | Feeds Chunk 1 & 3 |
-| **CHUNK-3: Working Capital** | Surplus alerts (>30/60/90d), capital-at-risk, dead stock, MOQ trap | `IN_PROGRESS` | Rishav + Agent | `main` | — | Feeds CFO alerts |
+| **CHUNK-3: Working Capital** | Surplus alerts (>30/60/90d), capital-at-risk, dead stock, MOQ trap | `COMPLETED` | Rishav + Agent | `main` | Awaiting peer verification | Feeds CFO alerts |
 | **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `PENDING` | Unassigned | `main` | — | V2 logistics |
 | **CHUNK-5: Integration Layer** | EasyEcom CSV/API adapter, Procura schemas, pipeline reconciliation | `PENDING` | Unassigned | `main` | — | V1 live sync |
 | **CHUNK-6: Dashboard & Alerts** | Health overview table, SKU deep-dive, DRR charts, approval flow | `PENDING` | Unassigned | `main` | — | Client prototype |
@@ -130,13 +130,28 @@ When you finish code:
 ---
 
 ### CHUNK-3: Working Capital & Overstocking Intelligence
-* **Status:** `IN_PROGRESS`
+* **Status:** `COMPLETED` (awaiting peer verification)
+* **Completed:** 23 Sep 2026
 * **Owner:** Rishav + Agent (`main`)
-* **Target Deliverables:**
-  * Surplus stock detector: `packages/core/src/surplus-detector.ts`
-  * Capital-at-risk calculator: `packages/core/src/capital-risk.ts`
-  * Dead stock analyzer (>90 days zero-movement): `packages/core/src/dead-stock.ts`
-* **Verification Command:** `npx tsx packages/core/src/tests/test-working-capital.ts`
+* **Deliverables:**
+  * Surplus stock detector with 30/60/90-day alert levels: `packages/core/src/surplus-detector.ts`
+  * Capital-at-risk and MSL impact calculator: `packages/core/src/capital-risk.ts`
+  * Sales-based dead/slow-moving stock analyzer: `packages/core/src/dead-stock.ts`
+  * MOQ overshoot and correctly-unitized cover analyzer: `packages/core/src/moq-trap.ts`
+  * Composite inventory health score: `packages/core/src/inventory-health-score.ts`
+  * Screenshot-linked SKU identities with simulated finance/aging assumptions: `packages/core/src/data/seed-working-capital.ts`
+  * Mathematical verification: `packages/core/src/tests/test-working-capital.ts`
+  * CFO working-capital report: `scripts/verify-chunk-3.ts`
+* **Verification Commands:**
+  * `npm run typecheck`
+  * `npm run test:chunk-1`
+  * `npm run test:chunk-2`
+  * `npm run test:chunk-3`
+  * `npm run verify:chunk-1`
+  * `npm run verify:chunk-2`
+  * `npm run verify:chunk-3`
+  * `npm test --workspace @inventoryiq/core`
+* **Verification Result:** All checks passed; CHUNK-1 and CHUNK-2 remained regression-safe. Capital amounts, aging scenarios, and incomplete health-score components are explicitly simulated prototype estimates.
 
 ---
 
