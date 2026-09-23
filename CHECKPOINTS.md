@@ -11,7 +11,7 @@
 | Chunk / Milestone | Description & Scope | Status | Owner / Worker | Branch / Commit | Verified By | Next Unlock |
 |---|---|:---:|---|---|---|---|
 | **P0: Documentation & Analysis** | Specs, 12 flaws, 25 screenshots, master context | `COMPLETED` | Rishav + Antigravity | `dd0ca54` | Verified | Unlocks all Chunks |
-| **CHUNK-1: Dynamic MSL Engine** | Rolling DRR (7/14/30d), event multipliers, dynamic MSL formula | `PENDING` | Unassigned | `main` | — | Unlocks Chunk 6 UI |
+| **CHUNK-1: Dynamic MSL Engine** | Rolling DRR (7/14/30d), event multipliers, dynamic MSL formula | `IN_PROGRESS` | Rishav + Agent | `main` | — | Unlocks Chunk 6 UI |
 | **CHUNK-2: Demand Intelligence** | Statistical SS formula, ABC/XYZ classifier, seasonality, RTO model | `PENDING` | Unassigned | `main` | — | Feeds Chunk 1 & 3 |
 | **CHUNK-3: Working Capital** | Surplus alerts (>30/60/90d), capital-at-risk, dead stock, MOQ trap | `PENDING` | Unassigned | `main` | — | Feeds CFO alerts |
 | **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `PENDING` | Unassigned | `main` | — | V2 logistics |
@@ -86,7 +86,8 @@ When you finish code:
 ---
 
 ### CHUNK-1: Dynamic MSL Engine
-* **Status:** `PENDING`
+* **Status:** `IN_PROGRESS`
+* **Owner:** Rishav + Agent (`main`)
 * **Target Deliverables:**
   * Engine implementation: `packages/core/src/msl-engine.ts`
   * Mathematical unit tests: 7-day, 14-day, 30-day DRR decay tests, event multiplier tests
