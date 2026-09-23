@@ -15,7 +15,7 @@
 | **CHUNK-2: Demand Intelligence** | Statistical SS formula, ABC/XYZ classifier, seasonality, RTO model | `COMPLETED` | Rishav + Agent | `902fc4c` | Awaiting peer verification | Feeds Chunk 1 & 3 |
 | **CHUNK-3: Working Capital** | Surplus alerts (>30/60/90d), capital-at-risk, dead stock, MOQ trap | `COMPLETED` | Rishav + Agent | `92fc31d` | Awaiting peer verification | Feeds CFO alerts |
 | **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `COMPLETED` | Rishav + Agent | `63051e6` | Awaiting peer verification | V2 logistics |
-| **CHUNK-5: Integration Layer** | EasyEcom CSV/API adapter, Procura schemas, pipeline reconciliation | `COMPLETED` | Rishav + Agent | `feat/chunk-4-transfer-intelligence` | Awaiting peer verification | V1 live sync |
+| **CHUNK-5: Integration Layer** | EasyEcom CSV/API adapter, Procura schemas, pipeline reconciliation | `COMPLETED` | Rishav + Agent | `86db0fb` | Awaiting peer verification | V1 live sync |
 | **CHUNK-6: Dashboard & Alerts** | Health overview table, SKU deep-dive, DRR charts, approval flow | `PENDING` | Unassigned | `main` | — | Client prototype |
 | **CHUNK-7: Vendor Intelligence** | Multi-vendor price comparison ($11.99 vs $13.30), OTIF scoring | `PENDING` | Unassigned | `main` | — | V1 procurement |
 | **MILESTONE: 2-3 Day Prototype** | Top 20-50 SKUs running dynamic MSL vs static MSL with mock/CSV feed | `PENDING` | Rishav & Shyam | `main` | — | Target: 24-25 Sep |
@@ -187,6 +187,7 @@ When you finish code:
 * **Status:** `COMPLETED` (awaiting peer verification)
 * **Completed:** 23 Sep 2026
 * **Owner:** Rishav + Agent (`feat/chunk-4-transfer-intelligence`)
+* **Implementation Commit:** `86db0fb`
 * **Deliverables:**
   * CSV tokenizer (quoted fields, escaped quotes, CRLF) plus Procura MSL export and Hundia per-warehouse stock parsers with header aliasing: `packages/integrations/src/csv-parser.ts`
   * EasyEcom order/return ingestion schema with validation and daily channel aggregation: `packages/integrations/src/easyecom.ts`
