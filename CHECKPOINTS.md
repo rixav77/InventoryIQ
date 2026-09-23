@@ -13,7 +13,7 @@
 | **P0: Documentation & Analysis** | Specs, 12 flaws, 25 screenshots, master context | `COMPLETED` | Rishav + Antigravity | `dd0ca54` | Verified | Unlocks all Chunks |
 | **CHUNK-1: Dynamic MSL Engine** | Rolling DRR (7/14/30d), event multipliers, dynamic MSL formula | `COMPLETED` | Rishav + Agent | `853195e` | Awaiting peer verification | Unlocks Chunk 6 UI |
 | **CHUNK-2: Demand Intelligence** | Statistical SS formula, ABC/XYZ classifier, seasonality, RTO model | `COMPLETED` | Rishav + Agent | `902fc4c` | Awaiting peer verification | Feeds Chunk 1 & 3 |
-| **CHUNK-3: Working Capital** | Surplus alerts (>30/60/90d), capital-at-risk, dead stock, MOQ trap | `COMPLETED` | Rishav + Agent | `main` | Awaiting peer verification | Feeds CFO alerts |
+| **CHUNK-3: Working Capital** | Surplus alerts (>30/60/90d), capital-at-risk, dead stock, MOQ trap | `COMPLETED` | Rishav + Agent | `92fc31d` | Awaiting peer verification | Feeds CFO alerts |
 | **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `PENDING` | Unassigned | `main` | — | V2 logistics |
 | **CHUNK-5: Integration Layer** | EasyEcom CSV/API adapter, Procura schemas, pipeline reconciliation | `PENDING` | Unassigned | `main` | — | V1 live sync |
 | **CHUNK-6: Dashboard & Alerts** | Health overview table, SKU deep-dive, DRR charts, approval flow | `PENDING` | Unassigned | `main` | — | Client prototype |
@@ -133,6 +133,7 @@ When you finish code:
 * **Status:** `COMPLETED` (awaiting peer verification)
 * **Completed:** 23 Sep 2026
 * **Owner:** Rishav + Agent (`main`)
+* **Implementation Commit:** `92fc31d`
 * **Deliverables:**
   * Surplus stock detector with 30/60/90-day alert levels: `packages/core/src/surplus-detector.ts`
   * Capital-at-risk and MSL impact calculator: `packages/core/src/capital-risk.ts`
