@@ -17,7 +17,7 @@
 | **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `COMPLETED` | Rishav + Agent | `63051e6` | Awaiting peer verification | V2 logistics |
 | **CHUNK-5: Integration Layer** | EasyEcom CSV/API adapter, Procura schemas, pipeline reconciliation | `COMPLETED` | Rishav + Agent | `86db0fb` | Awaiting peer verification | V1 live sync |
 | **CHUNK-6: Dashboard & Alerts** | Health overview table, SKU deep-dive, DRR charts, approval flow | `COMPLETED` | Rishav + Agent | `6e484d8` | Awaiting peer verification | Client prototype |
-| **CHUNK-7: Vendor Intelligence** | Multi-vendor price comparison ($11.99 vs $13.30), OTIF scoring | `IN_PROGRESS` | Rishav + Agent | `feat/chunk-4-transfer-intelligence` | — | V1 procurement |
+| **CHUNK-7: Vendor Intelligence** | Multi-vendor price comparison ($11.99 vs $13.30), OTIF scoring | `COMPLETED` | Rishav + Agent | `feat/chunk-4-transfer-intelligence` | Awaiting peer verification | V1 procurement |
 | **MILESTONE: 2-3 Day Prototype** | Top 20-50 SKUs running dynamic MSL vs static MSL with mock/CSV feed | `PENDING` | Rishav & Shyam | `main` | — | Target: 24-25 Sep |
 
 ---
@@ -240,9 +240,27 @@ When you finish code:
 ---
 
 ### CHUNK-7: Vendor Intelligence & Procurement Allocation
-* **Status:** `IN_PROGRESS`
+* **Status:** `COMPLETED` (awaiting peer verification)
+* **Completed:** 23 Sep 2026
 * **Owner:** Rishav + Agent (`feat/chunk-4-transfer-intelligence`)
-* **Target Deliverables:**
-  * Cross-vendor rate comparator ($11.99 vs $13.30): `packages/core/src/vendor-rates.ts`
-  * Vendor OTIF scoring engine: `packages/core/src/vendor-otif.ts`
-* **Verification Command:** `npx tsx packages/core/src/tests/test-vendor-intel.ts`
+* **Deliverables:**
+  * Weighted OTIF vendor scorecard engine and tier classifier: `packages/core/src/vendor-otif.ts`
+  * Cross-vendor rate comparator, price-trend/spread alerts, concentration-risk bands, and smart allocation suggestions: `packages/core/src/vendor-rates.ts`
+  * Observed multi-vendor price history and performance seeds: `packages/core/src/data/seed-vendors.ts`
+  * Mathematical verification: `packages/core/src/tests/test-vendor-intel.ts`
+  * Procurement report: `scripts/verify-chunk-7.ts`
+* **Verification Commands:**
+  * `npm run typecheck`
+  * `npm run test:chunk-1`
+  * `npm run test:chunk-2`
+  * `npm run test:chunk-3`
+  * `npm run test:chunk-4`
+  * `npm run test:chunk-5`
+  * `npm run test:chunk-7`
+  * `npm run verify:chunk-1`
+  * `npm run verify:chunk-2`
+  * `npm run verify:chunk-3`
+  * `npm run verify:chunk-4`
+  * `npm run verify:chunk-5`
+  * `npm run verify:chunk-7`
+* **Verification Result:** All checks passed. Scorecards rank Global Connexions PREFERRED (90.0) and CEHK Industry NEEDS_IMPROVEMENT (66.8); the EVM-H61FHL comparison reproduces the $11.99–$13.30 spread (10.9%) and an 8.6% Yinghu price increase; concentration shows Yinghu at 72.3% (MODERATE); the 20,000-unit allocation recommends Global Connexions ($12.80, 28d) over Yinghu ($13.30, 42d) with a risk-mitigation split. Price history and vendor performance are observed from the CHUNK-7 spec.

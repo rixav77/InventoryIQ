@@ -17,7 +17,9 @@
     "verify:chunk-2": "tsx scripts/verify-chunk-2.ts",
     "verify:chunk-3": "tsx scripts/verify-chunk-3.ts",
     "verify:chunk-4": "tsx scripts/verify-chunk-4.ts",
-    "verify:chunk-5": "tsx scripts/verify-chunk-5.ts"
+    "verify:chunk-5": "tsx scripts/verify-chunk-5.ts",
+    "verify:chunk-7": "tsx scripts/verify-chunk-7.ts",
+    "test:chunk-7": "tsx packages/core/src/tests/test-vendor-intel.ts"
   },
   "devDependencies": {
     "@types/node": "^24.5.2",
