@@ -1,0 +1,14 @@
+{
+  "name": "@inventoryiq/integrations",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "tsx src/tests/test-ingestion.ts",
+    "test:chunk-5": "tsx src/tests/test-ingestion.ts"
+  }
+}

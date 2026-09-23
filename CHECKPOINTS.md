@@ -15,7 +15,7 @@
 | **CHUNK-2: Demand Intelligence** | Statistical SS formula, ABC/XYZ classifier, seasonality, RTO model | `COMPLETED` | Rishav + Agent | `902fc4c` | Awaiting peer verification | Feeds Chunk 1 & 3 |
 | **CHUNK-3: Working Capital** | Surplus alerts (>30/60/90d), capital-at-risk, dead stock, MOQ trap | `COMPLETED` | Rishav + Agent | `92fc31d` | Awaiting peer verification | Feeds CFO alerts |
 | **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `COMPLETED` | Rishav + Agent | `63051e6` | Awaiting peer verification | V2 logistics |
-| **CHUNK-5: Integration Layer** | EasyEcom CSV/API adapter, Procura schemas, pipeline reconciliation | `IN_PROGRESS` | Rishav + Agent | `feat/chunk-4-transfer-intelligence` | — | V1 live sync |
+| **CHUNK-5: Integration Layer** | EasyEcom CSV/API adapter, Procura schemas, pipeline reconciliation | `COMPLETED` | Rishav + Agent | `feat/chunk-4-transfer-intelligence` | Awaiting peer verification | V1 live sync |
 | **CHUNK-6: Dashboard & Alerts** | Health overview table, SKU deep-dive, DRR charts, approval flow | `PENDING` | Unassigned | `main` | — | Client prototype |
 | **CHUNK-7: Vendor Intelligence** | Multi-vendor price comparison ($11.99 vs $13.30), OTIF scoring | `PENDING` | Unassigned | `main` | — | V1 procurement |
 | **MILESTONE: 2-3 Day Prototype** | Top 20-50 SKUs running dynamic MSL vs static MSL with mock/CSV feed | `PENDING` | Rishav & Shyam | `main` | — | Target: 24-25 Sep |
@@ -184,13 +184,28 @@ When you finish code:
 ---
 
 ### CHUNK-5: Integration Layer
-* **Status:** `IN_PROGRESS`
+* **Status:** `COMPLETED` (awaiting peer verification)
+* **Completed:** 23 Sep 2026
 * **Owner:** Rishav + Agent (`feat/chunk-4-transfer-intelligence`)
-* **Target Deliverables:**
-  * CSV Parser for Procura MSL Export & Hundia Stock: `packages/integrations/src/csv-parser.ts`
-  * EasyEcom sales data ingestion schema: `packages/integrations/src/easyecom.ts`
-  * Database migration scripts: RDS PostgreSQL tables
-* **Verification Command:** `npx tsx packages/integrations/src/tests/test-ingestion.ts`
+* **Deliverables:**
+  * CSV tokenizer (quoted fields, escaped quotes, CRLF) plus Procura MSL export and Hundia per-warehouse stock parsers with header aliasing: `packages/integrations/src/csv-parser.ts`
+  * EasyEcom order/return ingestion schema with validation and daily channel aggregation: `packages/integrations/src/easyecom.ts`
+  * Idempotent RDS PostgreSQL initial schema and migration registry: `packages/integrations/migrations/001_initial_schema.sql`, `packages/integrations/src/migrations.ts`
+  * Mathematical verification: `packages/integrations/src/tests/test-ingestion.ts`
+  * Ingestion report: `scripts/verify-chunk-5.ts`
+* **Verification Commands:**
+  * `npm run typecheck`
+  * `npm run test:chunk-1`
+  * `npm run test:chunk-2`
+  * `npm run test:chunk-3`
+  * `npm run test:chunk-4`
+  * `npm run test:chunk-5`
+  * `npm run verify:chunk-1`
+  * `npm run verify:chunk-2`
+  * `npm run verify:chunk-3`
+  * `npm run verify:chunk-4`
+  * `npm run verify:chunk-5`
+* **Verification Result:** All checks passed; CHUNK-1 through CHUNK-4 remained regression-safe. Parsers and the EasyEcom schema are unit-tested against deterministic sample exports; no live API or database is contacted. The RDS migration is schema-only and idempotent (`CREATE TABLE IF NOT EXISTS`).
 
 ---
 
