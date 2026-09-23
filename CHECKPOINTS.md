@@ -14,7 +14,7 @@
 | **CHUNK-1: Dynamic MSL Engine** | Rolling DRR (7/14/30d), event multipliers, dynamic MSL formula | `COMPLETED` | Rishav + Agent | `853195e` | Awaiting peer verification | Unlocks Chunk 6 UI |
 | **CHUNK-2: Demand Intelligence** | Statistical SS formula, ABC/XYZ classifier, seasonality, RTO model | `COMPLETED` | Rishav + Agent | `902fc4c` | Awaiting peer verification | Feeds Chunk 1 & 3 |
 | **CHUNK-3: Working Capital** | Surplus alerts (>30/60/90d), capital-at-risk, dead stock, MOQ trap | `COMPLETED` | Rishav + Agent | `92fc31d` | Awaiting peer verification | Feeds CFO alerts |
-| **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `IN_PROGRESS` | Rishav + Agent | `feat/chunk-4-transfer-intelligence` | — | V2 logistics |
+| **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `COMPLETED` | Rishav + Agent | `feat/chunk-4-transfer-intelligence` | Awaiting peer verification | V2 logistics |
 | **CHUNK-5: Integration Layer** | EasyEcom CSV/API adapter, Procura schemas, pipeline reconciliation | `PENDING` | Unassigned | `main` | — | V1 live sync |
 | **CHUNK-6: Dashboard & Alerts** | Health overview table, SKU deep-dive, DRR charts, approval flow | `PENDING` | Unassigned | `main` | — | Client prototype |
 | **CHUNK-7: Vendor Intelligence** | Multi-vendor price comparison ($11.99 vs $13.30), OTIF scoring | `PENDING` | Unassigned | `main` | — | V1 procurement |
@@ -157,12 +157,28 @@ When you finish code:
 ---
 
 ### CHUNK-4: Multi-Location Transfer Intelligence
-* **Status:** `IN_PROGRESS`
+* **Status:** `COMPLETED` (awaiting peer verification)
+* **Completed:** 23 Sep 2026
 * **Owner:** Rishav + Agent (`feat/chunk-4-transfer-intelligence`)
-* **Target Deliverables:**
-  * Mumbai cluster proximity matrix: `packages/core/src/proximity-matrix.ts`
-  * Surplus-to-deficit rebalance solver: `packages/core/src/transfer-optimizer.ts`
-* **Verification Command:** `npx tsx packages/core/src/tests/test-transfers.ts`
+* **Deliverables:**
+  * Seven-warehouse registry with Mumbai cluster, North, and South regions: `packages/core/src/data/seed-warehouses.ts`
+  * Symmetric proximity matrix, transit-speed classifier, and cluster-flat transfer cost: `packages/core/src/proximity-matrix.ts`
+  * Per-warehouse surplus/deficit analyzer and ring-fenced transfer optimizer: `packages/core/src/transfer-optimizer.ts`
+  * P0109-B and EVM-25/128GB observed anchors with deterministic per-warehouse splits: `packages/core/src/data/seed-warehouses.ts`
+  * Mathematical verification: `packages/core/src/tests/test-transfers.ts`
+  * Multi-location transfer report: `scripts/verify-chunk-4.ts`
+* **Verification Commands:**
+  * `npm run typecheck`
+  * `npm run test:chunk-1`
+  * `npm run test:chunk-2`
+  * `npm run test:chunk-3`
+  * `npm run test:chunk-4`
+  * `npm run verify:chunk-1`
+  * `npm run verify:chunk-2`
+  * `npm run verify:chunk-3`
+  * `npm run verify:chunk-4`
+  * `npm test --workspace @inventoryiq/core`
+* **Verification Result:** All checks passed; CHUNK-1, CHUNK-2, and CHUNK-3 remained regression-safe. Warehouse registry, proximity distances, and the P0109-B and EVM-25/128GB anchors are observed; per-warehouse splits, allocated stock, demand shares, and transfer cost rates are deterministic prototype simulations. Transfers are recommendations only, with no WMS write-back.
 
 ---
 
