@@ -17,7 +17,7 @@
 | **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `COMPLETED` | Rishav + Agent | `63051e6` | Awaiting peer verification | V2 logistics |
 | **CHUNK-5: Integration Layer** | EasyEcom CSV/API adapter, Procura schemas, pipeline reconciliation | `COMPLETED` | Rishav + Agent | `86db0fb` | Awaiting peer verification | V1 live sync |
 | **CHUNK-6: Dashboard & Alerts** | Health overview table, SKU deep-dive, DRR charts, approval flow | `COMPLETED` | Rishav + Agent | `6e484d8` | Awaiting peer verification | Client prototype |
-| **CHUNK-7: Vendor Intelligence** | Multi-vendor price comparison ($11.99 vs $13.30), OTIF scoring | `COMPLETED` | Rishav + Agent | `feat/chunk-4-transfer-intelligence` | Awaiting peer verification | V1 procurement |
+| **CHUNK-7: Vendor Intelligence** | Multi-vendor price comparison ($11.99 vs $13.30), OTIF scoring | `COMPLETED` | Rishav + Agent | `15089f6` | Awaiting peer verification | V1 procurement |
 | **MILESTONE: 2-3 Day Prototype** | Top 20-50 SKUs running dynamic MSL vs static MSL with mock/CSV feed | `PENDING` | Rishav & Shyam | `main` | — | Target: 24-25 Sep |
 
 ---
@@ -243,6 +243,7 @@ When you finish code:
 * **Status:** `COMPLETED` (awaiting peer verification)
 * **Completed:** 23 Sep 2026
 * **Owner:** Rishav + Agent (`feat/chunk-4-transfer-intelligence`)
+* **Implementation Commit:** `15089f6`
 * **Deliverables:**
   * Weighted OTIF vendor scorecard engine and tier classifier: `packages/core/src/vendor-otif.ts`
   * Cross-vendor rate comparator, price-trend/spread alerts, concentration-risk bands, and smart allocation suggestions: `packages/core/src/vendor-rates.ts`
