@@ -16,7 +16,7 @@
 | **CHUNK-3: Working Capital** | Surplus alerts (>30/60/90d), capital-at-risk, dead stock, MOQ trap | `COMPLETED` | Rishav + Agent | `92fc31d` | Awaiting peer verification | Feeds CFO alerts |
 | **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `COMPLETED` | Rishav + Agent | `63051e6` | Awaiting peer verification | V2 logistics |
 | **CHUNK-5: Integration Layer** | EasyEcom CSV/API adapter, Procura schemas, pipeline reconciliation | `COMPLETED` | Rishav + Agent | `86db0fb` | Awaiting peer verification | V1 live sync |
-| **CHUNK-6: Dashboard & Alerts** | Health overview table, SKU deep-dive, DRR charts, approval flow | `PENDING` | Unassigned | `main` | — | Client prototype |
+| **CHUNK-6: Dashboard & Alerts** | Health overview table, SKU deep-dive, DRR charts, approval flow | `IN_PROGRESS` | Rishav + Agent | `feat/chunk-4-transfer-intelligence` | — | Client prototype |
 | **CHUNK-7: Vendor Intelligence** | Multi-vendor price comparison ($11.99 vs $13.30), OTIF scoring | `PENDING` | Unassigned | `main` | — | V1 procurement |
 | **MILESTONE: 2-3 Day Prototype** | Top 20-50 SKUs running dynamic MSL vs static MSL with mock/CSV feed | `PENDING` | Rishav & Shyam | `main` | — | Target: 24-25 Sep |
 
@@ -211,7 +211,8 @@ When you finish code:
 ---
 
 ### CHUNK-6: Dashboard & Alerts
-* **Status:** `PENDING`
+* **Status:** `IN_PROGRESS`
+* **Owner:** Rishav + Agent (`feat/chunk-4-transfer-intelligence`)
 * **Target Deliverables:**
   * React/Vite web application: `packages/frontend/`
   * Dynamic MSL vs Static MSL comparison table
