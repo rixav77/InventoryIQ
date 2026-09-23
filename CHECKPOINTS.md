@@ -11,7 +11,7 @@
 | Chunk / Milestone | Description & Scope | Status | Owner / Worker | Branch / Commit | Verified By | Next Unlock |
 |---|---|:---:|---|---|---|---|
 | **P0: Documentation & Analysis** | Specs, 12 flaws, 25 screenshots, master context | `COMPLETED` | Rishav + Antigravity | `dd0ca54` | Verified | Unlocks all Chunks |
-| **CHUNK-1: Dynamic MSL Engine** | Rolling DRR (7/14/30d), event multipliers, dynamic MSL formula | `IN_PROGRESS` | Rishav + Agent | `main` | — | Unlocks Chunk 6 UI |
+| **CHUNK-1: Dynamic MSL Engine** | Rolling DRR (7/14/30d), event multipliers, dynamic MSL formula | `COMPLETED` | Rishav + Agent | `main` | Awaiting peer verification | Unlocks Chunk 6 UI |
 | **CHUNK-2: Demand Intelligence** | Statistical SS formula, ABC/XYZ classifier, seasonality, RTO model | `PENDING` | Unassigned | `main` | — | Feeds Chunk 1 & 3 |
 | **CHUNK-3: Working Capital** | Surplus alerts (>30/60/90d), capital-at-risk, dead stock, MOQ trap | `PENDING` | Unassigned | `main` | — | Feeds CFO alerts |
 | **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `PENDING` | Unassigned | `main` | — | V2 logistics |
@@ -86,13 +86,21 @@ When you finish code:
 ---
 
 ### CHUNK-1: Dynamic MSL Engine
-* **Status:** `IN_PROGRESS`
+* **Status:** `COMPLETED` (awaiting peer verification)
+* **Completed:** 22 Sep 2026
 * **Owner:** Rishav + Agent (`main`)
-* **Target Deliverables:**
-  * Engine implementation: `packages/core/src/msl-engine.ts`
-  * Mathematical unit tests: 7-day, 14-day, 30-day DRR decay tests, event multiplier tests
-  * Output schema: JSON recommendation structure with human-readable rationale
-* **Verification Command:** `npx tsx packages/core/src/tests/test-msl-engine.ts`
+* **Deliverables:**
+  * TypeScript workspace and public engine facade: `packages/core/src/msl-engine.ts`
+  * DRR, safety stock, static MSL, and dynamic MSL modules: `packages/core/src/engine/`
+  * Eight screenshot-grounded EVM SKU records with deterministic simulated 90-day demand: `packages/core/src/data/seed-skus.ts`
+  * Mathematical verification: `packages/core/src/tests/test-msl-engine.ts`
+  * Static-vs-dynamic normal/GIF report: `scripts/verify-chunk-1.ts`
+  * Structured recommendation output with human-readable rationale and data provenance
+* **Verification Commands:**
+  * `npm run typecheck`
+  * `npx tsx packages/core/src/tests/test-msl-engine.ts`
+  * `npx tsx scripts/verify-chunk-1.ts`
+* **Verification Result:** All checks passed; 8 observed SKU rows reconciled against EVM's static formulas.
 
 ---
 

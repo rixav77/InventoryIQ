@@ -1,0 +1,22 @@
+{
+  "name": "inventoryiq",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test:chunk-1": "tsx packages/core/src/tests/test-msl-engine.ts",
+    "verify:chunk-1": "tsx scripts/verify-chunk-1.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
