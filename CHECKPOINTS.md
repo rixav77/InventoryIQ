@@ -12,7 +12,7 @@
 |---|---|:---:|---|---|---|---|
 | **P0: Documentation & Analysis** | Specs, 12 flaws, 25 screenshots, master context | `COMPLETED` | Rishav + Antigravity | `dd0ca54` | Verified | Unlocks all Chunks |
 | **CHUNK-1: Dynamic MSL Engine** | Rolling DRR (7/14/30d), event multipliers, dynamic MSL formula | `COMPLETED` | Rishav + Agent | `853195e` | Awaiting peer verification | Unlocks Chunk 6 UI |
-| **CHUNK-2: Demand Intelligence** | Statistical SS formula, ABC/XYZ classifier, seasonality, RTO model | `IN_PROGRESS` | Rishav + Agent | `main` | — | Feeds Chunk 1 & 3 |
+| **CHUNK-2: Demand Intelligence** | Statistical SS formula, ABC/XYZ classifier, seasonality, RTO model | `COMPLETED` | Rishav + Agent | `main` | Awaiting peer verification | Feeds Chunk 1 & 3 |
 | **CHUNK-3: Working Capital** | Surplus alerts (>30/60/90d), capital-at-risk, dead stock, MOQ trap | `PENDING` | Unassigned | `main` | — | Feeds CFO alerts |
 | **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `PENDING` | Unassigned | `main` | — | V2 logistics |
 | **CHUNK-5: Integration Layer** | EasyEcom CSV/API adapter, Procura schemas, pipeline reconciliation | `PENDING` | Unassigned | `main` | — | V1 live sync |
@@ -106,13 +106,25 @@ When you finish code:
 ---
 
 ### CHUNK-2: Demand Intelligence & Safety Stock
-* **Status:** `IN_PROGRESS`
+* **Status:** `COMPLETED` (awaiting peer verification)
+* **Completed:** 23 Sep 2026
 * **Owner:** Rishav + Agent (`main`)
-* **Target Deliverables:**
-  * Statistical safety stock calculator: `packages/core/src/safety-stock.ts`
-  * ABC/XYZ classifier: `packages/core/src/abc-xyz-classifier.ts`
-  * Net DRR factoring RTO: `packages/core/src/net-demand.ts`
-* **Verification Command:** `npx tsx packages/core/src/tests/test-demand-intel.ts`
+* **Deliverables:**
+  * DRR 7/14/30/90, trend, and volatility metrics: `packages/core/src/demand-intelligence/`
+  * ABC/XYZ portfolio classifier and service policies: `packages/core/src/abc-xyz-classifier.ts`
+  * Class-driven statistical safety stock facade: `packages/core/src/safety-stock.ts`
+  * Net DRR factoring marketplace returns: `packages/core/src/net-demand.ts`
+  * Monthly seasonal-index calculator: `packages/core/src/seasonality.ts`
+  * Sixteen deterministic SKU-channel profiles with explicit simulation provenance: `packages/core/src/data/seed-demand-intelligence.ts`
+  * Mathematical verification: `packages/core/src/tests/test-demand-intel.ts`
+  * Demand-intelligence report: `scripts/verify-chunk-2.ts`
+* **Verification Commands:**
+  * `npm run typecheck`
+  * `npx tsx packages/core/src/tests/test-msl-engine.ts`
+  * `npx tsx packages/core/src/tests/test-demand-intel.ts`
+  * `npx tsx scripts/verify-chunk-1.ts`
+  * `npx tsx scripts/verify-chunk-2.ts`
+* **Verification Result:** All checks passed; CHUNK-1 remained regression-safe and 16 simulated SKU-channel profiles produced class-driven recommendations.
 
 ---
 

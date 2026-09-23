@@ -9,7 +9,9 @@
   "scripts": {
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test:chunk-1": "tsx packages/core/src/tests/test-msl-engine.ts",
-    "verify:chunk-1": "tsx scripts/verify-chunk-1.ts"
+    "test:chunk-2": "tsx packages/core/src/tests/test-demand-intel.ts",
+    "verify:chunk-1": "tsx scripts/verify-chunk-1.ts",
+    "verify:chunk-2": "tsx scripts/verify-chunk-2.ts"
   },
   "devDependencies": {
     "@types/node": "^24.5.2",
