@@ -14,10 +14,10 @@
 | **CHUNK-1: Dynamic MSL Engine** | Rolling DRR (7/14/30d), event multipliers, dynamic MSL formula | `COMPLETED` | Rishav + Agent | `853195e` | Awaiting peer verification | Unlocks Chunk 6 UI |
 | **CHUNK-2: Demand Intelligence** | Statistical SS formula, ABC/XYZ classifier, seasonality, RTO model | `COMPLETED` | Rishav + Agent | `902fc4c` | Awaiting peer verification | Feeds Chunk 1 & 3 |
 | **CHUNK-3: Working Capital** | Surplus alerts (>30/60/90d), capital-at-risk, dead stock, MOQ trap | `COMPLETED` | Rishav + Agent | `92fc31d` | Awaiting peer verification | Feeds CFO alerts |
-| **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `PENDING` | Unassigned | `main` | — | V2 logistics |
-| **CHUNK-5: Integration Layer** | EasyEcom CSV/API adapter, Procura schemas, pipeline reconciliation | `PENDING` | Unassigned | `main` | — | V1 live sync |
-| **CHUNK-6: Dashboard & Alerts** | Health overview table, SKU deep-dive, DRR charts, approval flow | `PENDING` | Unassigned | `main` | — | Client prototype |
-| **CHUNK-7: Vendor Intelligence** | Multi-vendor price comparison ($11.99 vs $13.30), OTIF scoring | `PENDING` | Unassigned | `main` | — | V1 procurement |
+| **CHUNK-4: Transfer Intelligence** | 6-warehouse surplus/deficit map, Mumbai cluster proximity matrix | `COMPLETED` | Rishav + Agent | `63051e6` | Awaiting peer verification | V2 logistics |
+| **CHUNK-5: Integration Layer** | EasyEcom CSV/API adapter, Procura schemas, pipeline reconciliation | `COMPLETED` | Rishav + Agent | `86db0fb` | Awaiting peer verification | V1 live sync |
+| **CHUNK-6: Dashboard & Alerts** | Health overview table, SKU deep-dive, DRR charts, approval flow | `COMPLETED` | Rishav + Agent | `6e484d8` | Awaiting peer verification | Client prototype |
+| **CHUNK-7: Vendor Intelligence** | Multi-vendor price comparison ($11.99 vs $13.30), OTIF scoring | `COMPLETED` | Rishav + Agent | `15089f6` | Awaiting peer verification | V1 procurement |
 | **MILESTONE: 2-3 Day Prototype** | Top 20-50 SKUs running dynamic MSL vs static MSL with mock/CSV feed | `PENDING` | Rishav & Shyam | `main` | — | Target: 24-25 Sep |
 
 ---
@@ -157,38 +157,111 @@ When you finish code:
 ---
 
 ### CHUNK-4: Multi-Location Transfer Intelligence
-* **Status:** `PENDING`
-* **Target Deliverables:**
-  * Mumbai cluster proximity matrix: `packages/core/src/proximity-matrix.ts`
-  * Surplus-to-deficit rebalance solver: `packages/core/src/transfer-optimizer.ts`
-* **Verification Command:** `npx tsx packages/core/src/tests/test-transfers.ts`
+* **Status:** `COMPLETED` (awaiting peer verification)
+* **Completed:** 23 Sep 2026
+* **Owner:** Rishav + Agent (`feat/chunk-4-transfer-intelligence`)
+* **Implementation Commit:** `63051e6`
+* **Deliverables:**
+  * Seven-warehouse registry with Mumbai cluster, North, and South regions: `packages/core/src/data/seed-warehouses.ts`
+  * Symmetric proximity matrix, transit-speed classifier, and cluster-flat transfer cost: `packages/core/src/proximity-matrix.ts`
+  * Per-warehouse surplus/deficit analyzer and ring-fenced transfer optimizer: `packages/core/src/transfer-optimizer.ts`
+  * P0109-B and EVM-25/128GB observed anchors with deterministic per-warehouse splits: `packages/core/src/data/seed-warehouses.ts`
+  * Mathematical verification: `packages/core/src/tests/test-transfers.ts`
+  * Multi-location transfer report: `scripts/verify-chunk-4.ts`
+* **Verification Commands:**
+  * `npm run typecheck`
+  * `npm run test:chunk-1`
+  * `npm run test:chunk-2`
+  * `npm run test:chunk-3`
+  * `npm run test:chunk-4`
+  * `npm run verify:chunk-1`
+  * `npm run verify:chunk-2`
+  * `npm run verify:chunk-3`
+  * `npm run verify:chunk-4`
+  * `npm test --workspace @inventoryiq/core`
+* **Verification Result:** All checks passed; CHUNK-1, CHUNK-2, and CHUNK-3 remained regression-safe. Warehouse registry, proximity distances, and the P0109-B and EVM-25/128GB anchors are observed; per-warehouse splits, allocated stock, demand shares, and transfer cost rates are deterministic prototype simulations. Transfers are recommendations only, with no WMS write-back.
 
 ---
 
 ### CHUNK-5: Integration Layer
-* **Status:** `PENDING`
-* **Target Deliverables:**
-  * CSV Parser for Procura MSL Export & Hundia Stock: `packages/integrations/src/csv-parser.ts`
-  * EasyEcom sales data ingestion schema: `packages/integrations/src/easyecom.ts`
-  * Database migration scripts: RDS PostgreSQL tables
-* **Verification Command:** `npx tsx packages/integrations/src/tests/test-ingestion.ts`
+* **Status:** `COMPLETED` (awaiting peer verification)
+* **Completed:** 23 Sep 2026
+* **Owner:** Rishav + Agent (`feat/chunk-4-transfer-intelligence`)
+* **Implementation Commit:** `86db0fb`
+* **Deliverables:**
+  * CSV tokenizer (quoted fields, escaped quotes, CRLF) plus Procura MSL export and Hundia per-warehouse stock parsers with header aliasing: `packages/integrations/src/csv-parser.ts`
+  * EasyEcom order/return ingestion schema with validation and daily channel aggregation: `packages/integrations/src/easyecom.ts`
+  * Idempotent RDS PostgreSQL initial schema and migration registry: `packages/integrations/migrations/001_initial_schema.sql`, `packages/integrations/src/migrations.ts`
+  * Mathematical verification: `packages/integrations/src/tests/test-ingestion.ts`
+  * Ingestion report: `scripts/verify-chunk-5.ts`
+* **Verification Commands:**
+  * `npm run typecheck`
+  * `npm run test:chunk-1`
+  * `npm run test:chunk-2`
+  * `npm run test:chunk-3`
+  * `npm run test:chunk-4`
+  * `npm run test:chunk-5`
+  * `npm run verify:chunk-1`
+  * `npm run verify:chunk-2`
+  * `npm run verify:chunk-3`
+  * `npm run verify:chunk-4`
+  * `npm run verify:chunk-5`
+* **Verification Result:** All checks passed; CHUNK-1 through CHUNK-4 remained regression-safe. Parsers and the EasyEcom schema are unit-tested against deterministic sample exports; no live API or database is contacted. The RDS migration is schema-only and idempotent (`CREATE TABLE IF NOT EXISTS`).
 
 ---
 
 ### CHUNK-6: Dashboard & Alerts
-* **Status:** `PENDING`
-* **Target Deliverables:**
-  * React/Vite web application: `packages/frontend/`
-  * Dynamic MSL vs Static MSL comparison table
-  * SKU deep-dive drawer with DRR charts & reasoning
-  * Approval workflow action triggers (Approve / Modify / Reject)
-* **Verification Command:** `cd packages/frontend && npm run build`
+* **Status:** `COMPLETED` (awaiting peer verification)
+* **Completed:** 23 Sep 2026
+* **Owner:** Rishav + Agent (`feat/chunk-4-transfer-intelligence`)
+* **Implementation Commit:** `6e484d8`
+* **Deliverables:**
+  * React + Vite dashboard consuming the live `@inventoryiq/core` engine source: `packages/frontend/`
+  * MSL health overview table with static vs dynamic MSL, action, and band columns: `packages/frontend/src/components/SkuTable.tsx`
+  * SKU deep dive with DRR line chart and static-vs-dynamic MSL bar chart (Recharts): `packages/frontend/src/components/SkuDeepDive.tsx`
+  * Approve / Dismiss recommendation workflow: `packages/frontend/src/components/RecommendationList.tsx`
+  * Deterministic data layer (static MSL, dynamic MSL, safety stock, surplus capital): `packages/frontend/src/data/dashboard-data.ts`
+  * Vite resolver plugin mapping the engine's NodeNext `.js` specifiers to `.ts` source: `packages/frontend/vite.config.ts`
+* **Verification Commands:**
+  * `npm run typecheck`
+  * `cd packages/frontend && npm run build`
+  * `npm run test:chunk-1`
+  * `npm run test:chunk-2`
+  * `npm run test:chunk-3`
+  * `npm run test:chunk-4`
+  * `npm run test:chunk-5`
+  * `npm run verify:chunk-1`
+  * `npm run verify:chunk-2`
+  * `npm run verify:chunk-3`
+  * `npm run verify:chunk-4`
+  * `npm run verify:chunk-5`
+* **Verification Result:** `tsc --noEmit` and `vite build` both pass; the dashboard bundles the engine (Chunks 1-5) and renders the 8-SKU MSL comparison. Prototype scope only: WhatsApp/email alerts, auth, sale-event calendar, and Procura write-back are deferred to V1. Styling uses hand-written CSS rather than TailwindCSS to avoid an additional build dependency in the prototype.
 
 ---
 
 ### CHUNK-7: Vendor Intelligence & Procurement Allocation
-* **Status:** `PENDING`
-* **Target Deliverables:**
-  * Cross-vendor rate comparator ($11.99 vs $13.30): `packages/core/src/vendor-rates.ts`
-  * Vendor OTIF scoring engine: `packages/core/src/vendor-otif.ts`
-* **Verification Command:** `npx tsx packages/core/src/tests/test-vendor-intel.ts`
+* **Status:** `COMPLETED` (awaiting peer verification)
+* **Completed:** 23 Sep 2026
+* **Owner:** Rishav + Agent (`feat/chunk-4-transfer-intelligence`)
+* **Implementation Commit:** `15089f6`
+* **Deliverables:**
+  * Weighted OTIF vendor scorecard engine and tier classifier: `packages/core/src/vendor-otif.ts`
+  * Cross-vendor rate comparator, price-trend/spread alerts, concentration-risk bands, and smart allocation suggestions: `packages/core/src/vendor-rates.ts`
+  * Observed multi-vendor price history and performance seeds: `packages/core/src/data/seed-vendors.ts`
+  * Mathematical verification: `packages/core/src/tests/test-vendor-intel.ts`
+  * Procurement report: `scripts/verify-chunk-7.ts`
+* **Verification Commands:**
+  * `npm run typecheck`
+  * `npm run test:chunk-1`
+  * `npm run test:chunk-2`
+  * `npm run test:chunk-3`
+  * `npm run test:chunk-4`
+  * `npm run test:chunk-5`
+  * `npm run test:chunk-7`
+  * `npm run verify:chunk-1`
+  * `npm run verify:chunk-2`
+  * `npm run verify:chunk-3`
+  * `npm run verify:chunk-4`
+  * `npm run verify:chunk-5`
+  * `npm run verify:chunk-7`
+* **Verification Result:** All checks passed. Scorecards rank Global Connexions PREFERRED (90.0) and CEHK Industry NEEDS_IMPROVEMENT (66.8); the EVM-H61FHL comparison reproduces the $11.99–$13.30 spread (10.9%) and an 8.6% Yinghu price increase; concentration shows Yinghu at 72.3% (MODERATE); the 20,000-unit allocation recommends Global Connexions ($12.80, 28d) over Yinghu ($13.30, 42d) with a risk-mitigation split. Price history and vendor performance are observed from the CHUNK-7 spec.

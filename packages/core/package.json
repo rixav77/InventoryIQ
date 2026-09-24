@@ -8,9 +8,11 @@
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
-    "test": "tsx src/tests/test-msl-engine.ts && tsx src/tests/test-demand-intel.ts && tsx src/tests/test-working-capital.ts",
+    "test": "tsx src/tests/test-msl-engine.ts && tsx src/tests/test-demand-intel.ts && tsx src/tests/test-working-capital.ts && tsx src/tests/test-transfers.ts && tsx src/tests/test-vendor-intel.ts",
     "test:chunk-1": "tsx src/tests/test-msl-engine.ts",
     "test:chunk-2": "tsx src/tests/test-demand-intel.ts",
-    "test:chunk-3": "tsx src/tests/test-working-capital.ts"
+    "test:chunk-3": "tsx src/tests/test-working-capital.ts",
+    "test:chunk-4": "tsx src/tests/test-transfers.ts",
+    "test:chunk-7": "tsx src/tests/test-vendor-intel.ts"
   }
 }
