@@ -91,7 +91,7 @@ test('EasyEcom aggregation counts fulfilled orders and nets returns', () => {
     { orderId: 'o5', sku: 'S', channel: 'amazon', quantity: 2, orderDate: '2026-09-20', status: 'CANCELLED' },
   ];
   const returns = [
-    { orderId: 'o1', sku: 'S', channel: 'amazon' as const, quantity: 4, returnDate: '2026-09-20' },
+    { orderId: 'o1', sku: 'S', channel: 'amazon' as const, quantity: 4, returnDate: '2026-09-23' },
   ];
   const aggregated = aggregateEasyEcomSales(orders, returns);
   assert.equal(aggregated.length, 2);
@@ -105,6 +105,31 @@ test('EasyEcom aggregation counts fulfilled orders and nets returns', () => {
   assert.equal(aggregated[1]?.channel, 'flipkart');
   assert.equal(aggregated[1]?.unitsSold, 8);
   assert.equal(aggregated[1]?.unitsReturned, 0);
+});
+
+test('EasyEcom returns must reference matching fulfilled orders within fulfilled quantity', () => {
+  const orders: EasyEcomOrder[] = [
+    { orderId: 'o1', sku: 'S', channel: 'amazon', quantity: 5, orderDate: '2026-09-20', status: 'DELIVERED' },
+  ];
+  assert.throws(
+    () => aggregateEasyEcomSales(orders, [
+      { orderId: 'missing', sku: 'S', channel: 'amazon', quantity: 1, returnDate: '2026-09-21' },
+    ]),
+    /unknown or unfulfilled/,
+  );
+  assert.throws(
+    () => aggregateEasyEcomSales(orders, [
+      { orderId: 'o1', sku: 'OTHER', channel: 'amazon', quantity: 1, returnDate: '2026-09-21' },
+    ]),
+    /does not match/,
+  );
+  assert.throws(
+    () => aggregateEasyEcomSales(orders, [
+      { orderId: 'o1', sku: 'S', channel: 'amazon', quantity: 3, returnDate: '2026-09-21' },
+      { orderId: 'o1', sku: 'S', channel: 'amazon', quantity: 3, returnDate: '2026-09-22' },
+    ]),
+    /exceed fulfilled quantity/,
+  );
 });
 
 test('EasyEcom validation flags duplicates and bad fields', () => {

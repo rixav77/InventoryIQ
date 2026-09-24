@@ -102,7 +102,7 @@ test('the P0109-B anchor recommends Bhiwandi to Delhi (approx 2,000 units, LOW r
   assert.match(delhi.reason, /BHIWANDI/);
 });
 
-test('ring-fencing never drains the source below its buffered MSL and caps by deficit', () => {
+test('ring-fencing never cumulatively drains a source below its buffered MSL', () => {
   const distribution = anchorDistribution();
   const positions = analyzeWarehouseSurplusDeficit(distribution);
   const recs = generateTransferRecommendations({
@@ -110,12 +110,22 @@ test('ring-fencing never drains the source below its buffered MSL and caps by de
     maxRecommendations: 10,
   });
   assert.ok(recs.length > 0);
+  const transferredBySource = new Map<string, number>();
   for (const rec of recs) {
-    const source = positions.find((position) => position.warehouseCode === rec.fromWarehouse);
     const destination = positions.find((position) => position.warehouseCode === rec.toWarehouse);
-    assert.ok(source && destination);
-    assert.ok(source.availableStock - rec.quantity >= source.warehouseMinimumStockLevel * 1.1 - 1e-9);
+    assert.ok(destination);
+    transferredBySource.set(
+      rec.fromWarehouse,
+      (transferredBySource.get(rec.fromWarehouse) ?? 0) + rec.quantity,
+    );
     assert.ok(rec.quantity <= destination.deficitUnits * 1.2 + 1e-9);
+  }
+  for (const [warehouseCode, transferred] of transferredBySource) {
+    const source = positions.find((position) => position.warehouseCode === warehouseCode);
+    assert.ok(source);
+    assert.ok(
+      source.availableStock - transferred >= source.warehouseMinimumStockLevel * 1.1 - 1e-9,
+    );
   }
 });
 

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {
   PROCUREMENT_PRICE_SEEDS,
   REORDER_VENDOR_QUOTES,
+  VENDOR_ALLOCATION_WEIGHTS,
   VENDOR_PERFORMANCE_SEEDS,
   VENDOR_SCORE_WEIGHTS,
   analyzeVendorConcentration,
@@ -111,12 +112,25 @@ test('concentration risk bands cover high, moderate, and low', () => {
   );
 });
 
-test('allocation suggestions recommend the cheapest quote and offer a split', () => {
+test('allocation suggestions balance price, lead time, and OTIF and offer a split', () => {
+  assertClose(
+    VENDOR_ALLOCATION_WEIGHTS.price +
+      VENDOR_ALLOCATION_WEIGHTS.leadTime +
+      VENDOR_ALLOCATION_WEIGHTS.otif,
+    1,
+  );
   const options = suggestVendorAllocation('EVM-H61FHL', 20_000, REORDER_VENDOR_QUOTES);
   assert.equal(options[0]?.vendorCode, 'GLOBAL-CONN');
   assert.equal(options[0]?.recommendation, 'RECOMMENDED');
   assert.equal(options[0]?.totalCost, 12.8 * 20_000);
+  assert.ok((options[0]?.selectionScore ?? 0) > (options[1]?.selectionScore ?? 0));
   assert.ok(options.some((option) => option.recommendation === 'RISK_MITIGATION'));
+
+  const reliabilityWins = suggestVendorAllocation('S', 100, [
+    { vendorCode: 'CHEAP-SLOW', vendorName: 'Cheap Slow', unitPrice: 9.8, leadTimeDays: 90, otifPercent: 40 },
+    { vendorCode: 'RELIABLE', vendorName: 'Reliable', unitPrice: 10, leadTimeDays: 20, otifPercent: 98 },
+  ]);
+  assert.equal(reliabilityWins[0]?.vendorCode, 'RELIABLE');
 });
 
 test('validation rejects malformed vendor inputs', () => {

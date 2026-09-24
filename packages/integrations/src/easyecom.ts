@@ -98,12 +98,29 @@ export function aggregateEasyEcomSales(
     bucketFor(order.orderDate, order.sku, order.channel).unitsSold += order.quantity;
   }
 
+  const ordersById = new Map(orders.map((order) => [order.orderId, order]));
+  const returnedByOrder = new Map<string, number>();
+
   for (const returned of returns) {
     if (!Number.isInteger(returned.quantity) || returned.quantity < 0) {
       throw new Error(`Invalid EasyEcom return quantity for order ${returned.orderId}.`);
     }
-    bucketFor(returned.returnDate, returned.sku, returned.channel).unitsReturned +=
-      returned.quantity;
+    if (!isIsoDate(returned.returnDate)) {
+      throw new Error(`Invalid EasyEcom return date for order ${returned.orderId}.`);
+    }
+    const order = ordersById.get(returned.orderId);
+    if (order === undefined || !SALE_STATUSES.includes(order.status)) {
+      throw new Error(`EasyEcom return references unknown or unfulfilled order ${returned.orderId}.`);
+    }
+    if (returned.sku !== order.sku || returned.channel !== order.channel) {
+      throw new Error(`EasyEcom return does not match order ${returned.orderId}.`);
+    }
+    const totalReturned = (returnedByOrder.get(returned.orderId) ?? 0) + returned.quantity;
+    if (totalReturned > order.quantity) {
+      throw new Error(`EasyEcom returns exceed fulfilled quantity for order ${returned.orderId}.`);
+    }
+    returnedByOrder.set(returned.orderId, totalReturned);
+    bucketFor(order.orderDate, order.sku, order.channel).unitsReturned += returned.quantity;
   }
 
   return [...buckets.values()].sort(

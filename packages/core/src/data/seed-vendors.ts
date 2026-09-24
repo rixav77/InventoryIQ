@@ -25,7 +25,7 @@ export const REORDER_VENDOR_QUOTES: readonly VendorQuote[] = [
 
 export const VENDOR_SEED_PROVENANCE = {
   priceHistory: 'observed',
-  vendorPerformance: 'observed',
-  reorderQuotes: 'observed',
+  vendorPerformance: 'simulated',
+  reorderQuotes: 'simulated',
   source: 'CHUNK-7-VENDOR-INTELLIGENCE.md',
 } as const;

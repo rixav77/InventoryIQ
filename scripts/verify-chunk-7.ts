@@ -74,7 +74,7 @@ console.table(
 );
 
 console.log(
-  `\nData note: price history, vendor performance inputs, and reorder quotes are observed from ${VENDOR_SEED_PROVENANCE.source}. ` +
+  `\nData note: procurement price history is observed from EVM screenshots; vendor performance inputs and reorder quotes are deterministic simulations based on examples in ${VENDOR_SEED_PROVENANCE.source}. ` +
     'Scorecard weights (OTIF 0.30, price 0.25, lead-time reliability 0.20, quality 0.15, responsiveness 0.10) follow the CHUNK-7 spec. ' +
     'Recommendations are advisory only.',
 );

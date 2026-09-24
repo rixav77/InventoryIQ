@@ -68,11 +68,17 @@ export interface VendorAllocationOption {
   averageUnitPrice: number;
   totalCost: number;
   leadTimeDays: number | null;
+  selectionScore: number | null;
   recommendation: AllocationRecommendation;
 }
 
 export const PRICE_SPREAD_ALERT_PERCENT = 10;
 export const PRICE_INCREASE_ALERT_PERCENT = 5;
+export const VENDOR_ALLOCATION_WEIGHTS = {
+  price: 0.5,
+  leadTime: 0.25,
+  otif: 0.25,
+} as const;
 
 function assertPricePoint(point: ProcurementPricePoint): void {
   if (point.sku.trim() === '') {
@@ -229,37 +235,60 @@ export function suggestVendorAllocation(
   }
   assertFinitePositive(quantity, 'quantity');
   for (const quote of quotes) {
+    if (quote.vendorCode.trim() === '' || quote.vendorName.trim() === '') {
+      throw new Error('quote vendorCode and vendorName must not be empty.');
+    }
     assertFinitePositive(quote.unitPrice, 'quote.unitPrice');
     assertFiniteNonNegative(quote.leadTimeDays, 'quote.leadTimeDays');
     assertFiniteNonNegative(quote.otifPercent, 'quote.otifPercent');
+    if (quote.otifPercent > 100) {
+      throw new Error('quote.otifPercent must be between 0 and 100.');
+    }
   }
 
-  const ranked = [...quotes].sort((a, b) => a.unitPrice - b.unitPrice);
-  const options: VendorAllocationOption[] = ranked.map((quote, index) => ({
+  const lowestPrice = Math.min(...quotes.map((quote) => quote.unitPrice));
+  const fastestLeadTime = Math.min(...quotes.map((quote) => quote.leadTimeDays));
+  const scored = quotes.map((quote) => ({
+    quote,
+    selectionScore:
+      VENDOR_ALLOCATION_WEIGHTS.price * (lowestPrice / quote.unitPrice) * 100 +
+      VENDOR_ALLOCATION_WEIGHTS.leadTime *
+        (quote.leadTimeDays === 0 ? 100 : (fastestLeadTime / quote.leadTimeDays) * 100) +
+      VENDOR_ALLOCATION_WEIGHTS.otif * quote.otifPercent,
+  }));
+  const ranked = scored.sort(
+    (a, b) =>
+      b.selectionScore - a.selectionScore ||
+      a.quote.unitPrice - b.quote.unitPrice ||
+      a.quote.vendorCode.localeCompare(b.quote.vendorCode),
+  );
+  const options: VendorAllocationOption[] = ranked.map(({ quote, selectionScore }, index) => ({
     label: quote.vendorName,
     vendorCode: quote.vendorCode,
     quantity,
     averageUnitPrice: quote.unitPrice,
     totalCost: quote.unitPrice * quantity,
     leadTimeDays: quote.leadTimeDays,
+    selectionScore,
     recommendation: index === 0 ? 'RECOMMENDED' : 'ALTERNATIVE',
   }));
 
   if (ranked.length >= 2) {
-    const cheapest = ranked[0];
-    const dearest = ranked[ranked.length - 1];
-    if (cheapest !== undefined && dearest !== undefined) {
+    const primary = ranked[0]?.quote;
+    const secondary = ranked[1]?.quote;
+    if (primary !== undefined && secondary !== undefined) {
       const firstHalf = Math.floor(quantity / 2);
       const secondHalf = quantity - firstHalf;
       const averageUnitPrice =
-        (cheapest.unitPrice * firstHalf + dearest.unitPrice * secondHalf) / quantity;
+        (primary.unitPrice * firstHalf + secondary.unitPrice * secondHalf) / quantity;
       options.push({
-        label: `Split ${cheapest.vendorName} / ${dearest.vendorName}`,
+        label: `Split ${primary.vendorName} / ${secondary.vendorName}`,
         vendorCode: null,
         quantity,
         averageUnitPrice,
         totalCost: averageUnitPrice * quantity,
         leadTimeDays: null,
+        selectionScore: null,
         recommendation: 'RISK_MITIGATION',
       });
     }

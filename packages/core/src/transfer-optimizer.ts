@@ -210,8 +210,23 @@ export function generateTransferRecommendations(
       continue;
     }
 
+    const reservedBySource = new Map<string, number>();
+
     for (const destination of destinations) {
-      const source = rankSources(sources, destination)[0];
+      const availableSources = sources
+        .map((source) => {
+          const reserved = reservedBySource.get(source.warehouseCode) ?? 0;
+          return {
+            ...source,
+            availableStock: source.availableStock - reserved,
+            surplusUnits: Math.max(source.surplusUnits - reserved, 0),
+          };
+        })
+        .filter(
+          (source) =>
+            source.availableStock - source.warehouseMinimumStockLevel * bufferFactor > 0,
+        );
+      const source = rankSources(availableSources, destination)[0];
       if (source === undefined) {
         continue;
       }
@@ -224,6 +239,10 @@ export function generateTransferRecommendations(
         continue;
       }
       recommendations.push(buildRecommendation(distribution, source, destination, quantity));
+      reservedBySource.set(
+        source.warehouseCode,
+        (reservedBySource.get(source.warehouseCode) ?? 0) + quantity,
+      );
     }
   }
 
