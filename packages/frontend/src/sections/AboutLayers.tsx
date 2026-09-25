@@ -4,7 +4,7 @@ import { PORTFOLIO, SKUS, TRANSFERS } from '../data/model';
 import { LIMITATIONS } from '../data/coverage';
 import type { Harm, Limitation } from '../data/coverage';
 import { PIPELINE_SOURCES, SCHEMA_TABLES } from '../data/pipeline';
-import { Badge } from '../components/ui';
+import { Badge, Callout } from '../components/ui';
 import type { Tone } from '../components/ui';
 import { Block, Fraction, Line, O, Pow, Root, Sub, V } from '../components/math';
 import { formatInrCompact, formatInt } from '../utils/format';
@@ -12,6 +12,7 @@ import { formatInrCompact, formatInt } from '../utils/format';
 /* ------------------------------------------------------------------- types */
 
 interface Layer {
+  kind?: 'layer';
   id: string;
   /** Tab label, kept short so the row stays one line. */
   label: string;
@@ -31,6 +32,22 @@ interface Layer {
   proof: readonly string[];
   where: string;
 }
+
+/*
+ * The two framing tabs that sit ahead of the layers. They carry the before and
+ * after of the core arithmetic, which is shared context rather than any single
+ * layer's job, so they present as free-form sections instead of layer stages.
+ */
+interface Frame {
+  kind: 'frame';
+  id: string;
+  label: string;
+  name: string;
+  headline: string;
+  sections: readonly { label: string; body: ReactNode }[];
+}
+
+type Tab = Layer | Frame;
 
 const LIMITATION_BY_N = new Map(LIMITATIONS.map((item) => [item.n, item]));
 
@@ -521,9 +538,344 @@ const LAYERS: readonly Layer[] = [
   },
 ];
 
+/* ------------------------------------------------------------------ frames */
+
+const PROBLEM_TAB: Frame = {
+  kind: 'frame',
+  id: 'problem',
+  label: 'The problem',
+  name: 'Assumptions where measurement belongs',
+  headline: 'Three inputs drive the level, and one of them is guesswork.',
+  sections: [
+    {
+      label: 'What Procura computes',
+      body: (
+        <>
+          <p className="layer-text">
+            Only two inputs come from the business. The monthly selling plan is typed by hand and rarely
+            changes, the procurement time is a constant, and safety stock sits at zero on every row. Everything
+            downstream inherits those three choices, so an assumption made months ago decides what is bought
+            today.
+          </p>
+          <Block label="Procura today">
+            <Line>
+              <V>MSL</V>
+              <O>=</O>
+              <Fraction
+                n={
+                  <>
+                    <V>MSP</V>
+                  </>
+                }
+                d="30"
+              />
+              <O>×</O>
+              <V>PT</V>
+            </Line>
+            <Line>
+              <V>ROL</V>
+              <O>=</O>
+              <span>max(</span>
+              <V>MSL</V>
+              <span>, </span>
+              <V>MOQ</V>
+              <span>)</span>
+            </Line>
+            <Line>
+              <V>ROQ</V>
+              <O>=</O>
+              <V>Open PO</V>
+              <O>+</O>
+              <V>In-Transit</V>
+              <O>+</O>
+              <V>Stock</V>
+              <O>−</O>
+              <V>ROL</V>
+            </Line>
+            <Line>
+              <V>Action</V>
+              <O>=</O>
+              <span className="math-key">REORDER NOW</span>
+            </Line>
+            <Line>
+              <span className="math-when">when</span>
+              <O> </O>
+              <span>(</span>
+              <V>Stock</V>
+              <O>+</O>
+              <V>Open PO</V>
+              <O>+</O>
+              <V>In-Transit</V>
+              <span>)</span>
+              <O>&lt;</O>
+              <V>ROL</V>
+            </Line>
+          </Block>
+          <p className="layer-note">
+            The monthly plan is the only term that reflects demand, and it is the one term no system measures.
+          </p>
+        </>
+      ),
+    },
+    {
+      label: 'Why it breaks on e-commerce',
+      body: (
+        <Callout tone="crit" title="A static formula cannot follow a volatile channel">
+          It cannot anticipate a festival spike or taper after one. Under-plan and the SKU loses the Buy Box and
+          its search rank; over-plan and the capital sits still. Procura alerts on shortage and stays silent on
+          excess, which is why the surplus went unnoticed. The flaw is not the arithmetic, it is that all three
+          inputs are assumptions where the business already holds the measurements.
+        </Callout>
+      ),
+    },
+  ],
+};
+
+const FIX_TAB: Frame = {
+  kind: 'frame',
+  id: 'fix',
+  label: 'The fix',
+  name: 'Measure instead of assume',
+  headline: 'Each guessed input is replaced by something computed from history.',
+  sections: [
+    {
+      label: 'The replacement arithmetic',
+      body: (
+        <>
+          <p className="layer-text">
+            The monthly plan gives way to a weighted run rate, the assumed procurement time to the mean of what
+            vendors actually took, and the hardcoded zero to a buffer sized from measured variance. Nothing in
+            the chain is typed in by hand, so the level moves when demand moves.
+          </p>
+          <Block label="Weighted run rate, level and buffer">
+            <Line>
+              <V>DRR</V>
+              <Sub>weighted</Sub>
+              <O>=</O>
+              <span>0.50</span>
+              <V>DRR</V>
+              <Sub>7</Sub>
+              <O>+</O>
+              <span>0.30</span>
+              <V>DRR</V>
+              <Sub>14</Sub>
+              <O>+</O>
+              <span>0.20</span>
+              <V>DRR</V>
+              <Sub>30</Sub>
+            </Line>
+            <Line>
+              <V>MSL</V>
+              <O>=</O>
+              <span>⌈</span>
+              <V>DRR</V>
+              <Sub>weighted</Sub>
+              <O>×</O>
+              <V>event</V>
+              <O>×</O>
+              <V>LT</V>
+              <Sub>avg</Sub>
+              <span>⌉</span>
+              <O>+</O>
+              <V>SS</V>
+            </Line>
+            <Line>
+              <V>SS</V>
+              <O>=</O>
+              <V>Z</V>
+              <Root>
+                <V>LT</V>
+                <Sub>avg</Sub>
+                <V>σ</V>
+                <Pow>2</Pow>
+                <Sub>d</Sub>
+                <O>+</O>
+                <V>DRR</V>
+                <Pow>2</Pow>
+                <V>σ</V>
+                <Pow>2</Pow>
+                <Sub>LT</Sub>
+              </Root>
+            </Line>
+            <Line>
+              <V>DRR</V>
+              <Sub>net</Sub>
+              <O>=</O>
+              <V>DRR</V>
+              <Sub>gross</Sub>
+              <O>×</O>
+              <span>(1 − </span>
+              <V>RTO</V>
+              <span>)</span>
+            </Line>
+          </Block>
+        </>
+      ),
+    },
+    {
+      label: 'Downstream rules',
+      body: (
+        <>
+          <Block label="Downstream rules">
+            <Line>
+              <V>surplus days</V>
+              <O>=</O>
+              <Fraction
+                n={
+                  <>
+                    <V>surplus units</V>
+                  </>
+                }
+                d={
+                  <>
+                    <V>DRR</V>
+                    <Sub>30</Sub>
+                  </>
+                }
+              />
+            </Line>
+            <Line>
+              <V>transfer qty</V>
+              <O>=</O>
+              <span>min(</span>
+              <V>source</V>
+              <O>−</O>
+              <V>MSL</V>
+              <Sub>source</Sub>
+              <O>×</O>
+              <span>1.10, </span>
+              <V>deficit</V>
+              <O>×</O>
+              <span>1.20)</span>
+            </Line>
+            <Line>
+              <V>vendor score</V>
+              <O>=</O>
+              <span>0.30</span>
+              <V>OTIF</V>
+              <O>+</O>
+              <span>0.25</span>
+              <V>price</V>
+              <O>+</O>
+              <span>0.20</span>
+              <V>LT</V>
+            </Line>
+            <Line>
+              <O>+</O>
+              <span>0.15</span>
+              <V>quality</V>
+              <O>+</O>
+              <span>0.10</span>
+              <V>responsiveness</V>
+            </Line>
+          </Block>
+          <p className="layer-note">
+            Each of these rules belongs to one of the layers that follow. The tabs after this one take them in
+            turn and show the problem each one removes, how it is broken down and what it produced in this run.
+          </p>
+        </>
+      ),
+    },
+  ],
+};
+
+/* ------------------------------------------------------------------- tabs */
+
+const TABS: readonly Tab[] = [PROBLEM_TAB, FIX_TAB, ...LAYERS];
+
 /* --------------------------------------------------------------- component */
 
-function LayerTabs({ layers }: { layers: readonly Layer[] }) {
+function Stage({ index, label, children }: { index: number; label: string; children: ReactNode }) {
+  return (
+    <div className="layer-stage">
+      <div className="layer-rail">
+        <span className="layer-rail-num">{String(index + 1).padStart(2, '0')}</span>
+        <span className="layer-rail-label">{label}</span>
+      </div>
+      <div className="layer-body">{children}</div>
+    </div>
+  );
+}
+
+function DefinitionList({ rows }: { rows: readonly { term: string; body: string }[] }) {
+  return (
+    <div className="defs">
+      {rows.map((row) => (
+        <div className="def" key={row.term}>
+          <div className="def-term">{row.term}</div>
+          <div className="def-body">{row.body}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function LayerStages({ layer, issues }: { layer: Layer; issues: readonly Limitation[] }) {
+  return (
+    <>
+      <Stage index={0} label="The problem">
+        <p className="layer-text">{layer.problem}</p>
+        {issues.length > 0 ? (
+          <ul className="layer-issues">
+            {issues.map((item) => (
+              <li key={item.n}>
+                <span className="layer-issues-n">#{item.n}</span>
+                <span className="layer-issues-text">{item.problem}</span>
+                <Badge tone={harmTone(item.harm)}>{item.harm}</Badge>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </Stage>
+
+      <Stage index={1} label="How it is broken down">
+        <div className="layer-split">
+          <div>
+            <div className="layer-split-label">Consumes</div>
+            <DefinitionList rows={layer.consumes} />
+          </div>
+          <div>
+            <div className="layer-split-label">Produces</div>
+            <DefinitionList rows={layer.produces} />
+          </div>
+        </div>
+        <Block label="The rule">{layer.rule}</Block>
+        <p className="layer-note">{layer.ruleNote}</p>
+      </Stage>
+
+      <Stage index={2} label="How we solve it">
+        <p className="layer-text">{layer.solution}</p>
+        {issues.length > 0 ? (
+          <div className="layer-outcomes">
+            {issues.map((item) => (
+              <div className="layer-outcome" key={item.n}>
+                <div className="layer-outcome-head">
+                  <span className="layer-issues-n">#{item.n}</span>
+                  <span className="layer-outcome-solution">{item.solution}</span>
+                  <Badge tone={item.status === 'ADDRESSED' ? 'ok' : 'neutral'}>{item.status}</Badge>
+                </div>
+                <div className="layer-outcome-evidence">{item.evidence}</div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+        {layer.proof.length > 0 ? (
+          <ul className="layer-proof">
+            {layer.proof.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        ) : null}
+        <div className="layer-where">
+          <span className="layer-where-label">Where to see it</span>
+          <span className="layer-where-value">{layer.where}</span>
+        </div>
+      </Stage>
+    </>
+  );
+}
+
+function LayerTabs({ tabs }: { tabs: readonly Tab[] }) {
   const [active, setActive] = useState(0);
   const listRef = useRef<HTMLDivElement>(null);
   const baseId = useId();
@@ -535,14 +887,14 @@ function LayerTabs({ layers }: { layers: readonly Layer[] }) {
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const buttons = listRef.current?.querySelectorAll<HTMLButtonElement>('[role="tab"]');
-    if (buttons === undefined) return;
-    const tabs = Array.from(buttons);
+    const elements = listRef.current?.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+    if (elements === undefined) return;
+    const tabButtons = Array.from(elements);
     // Drive from the focused tab rather than the selected one, so the two
     // cannot drift apart if focus arrived some other way.
-    const focused = tabs.indexOf(document.activeElement as HTMLButtonElement);
+    const focused = tabButtons.indexOf(document.activeElement as HTMLButtonElement);
     const from = focused === -1 ? active : focused;
-    const last = tabs.length - 1;
+    const last = tabButtons.length - 1;
 
     if (event.key === 'ArrowRight') {
       event.preventDefault();
@@ -559,12 +911,17 @@ function LayerTabs({ layers }: { layers: readonly Layer[] }) {
     }
   };
 
-  const current = layers[active];
+  const current = tabs[active];
   if (current === undefined) return null;
 
-  const issues = current.answers
-    .map((n) => LIMITATION_BY_N.get(n))
-    .filter((item): item is Limitation => item !== undefined);
+  // Only layers carry a limitations-ledger mapping; the framing tabs are
+  // context for the whole engine and have nothing to prove against it.
+  const issues: readonly Limitation[] =
+    current.kind === 'frame'
+      ? []
+      : current.answers
+          .map((n) => LIMITATION_BY_N.get(n))
+          .filter((item): item is Limitation => item !== undefined);
 
   const tabId = (id: string) => `${baseId}-tab-${id}`;
   const panelId = (id: string) => `${baseId}-panel-${id}`;
@@ -574,24 +931,24 @@ function LayerTabs({ layers }: { layers: readonly Layer[] }) {
       <div
         className="layer-tabs"
         role="tablist"
-        aria-label="Engine layers"
+        aria-label="How the engine works"
         ref={listRef}
         onKeyDown={onKeyDown}
       >
-        {layers.map((layer, index) => (
+        {tabs.map((tab, index) => (
           <button
-            key={layer.id}
+            key={tab.id}
             type="button"
             role="tab"
-            id={tabId(layer.id)}
+            id={tabId(tab.id)}
             className="layer-tab"
             aria-selected={index === active}
-            aria-controls={panelId(layer.id)}
+            aria-controls={panelId(tab.id)}
             tabIndex={index === active ? 0 : -1}
             onClick={() => setActive(index)}
           >
             <span className="layer-tab-num">{String(index + 1).padStart(2, '0')}</span>
-            {layer.label}
+            {tab.label}
           </button>
         ))}
       </div>
@@ -608,103 +965,20 @@ function LayerTabs({ layers }: { layers: readonly Layer[] }) {
           <p className="layer-headline">{current.headline}</p>
         </div>
 
-        <div className="layer-stage">
-          <div className="layer-rail">
-            <span className="layer-rail-num">01</span>
-            <span className="layer-rail-label">The problem</span>
-          </div>
-          <div className="layer-body">
-            <p className="layer-text">{current.problem}</p>
-            {issues.length > 0 ? (
-              <ul className="layer-issues">
-                {issues.map((item) => (
-                  <li key={item.n}>
-                    <span className="layer-issues-n">#{item.n}</span>
-                    <span className="layer-issues-text">{item.problem}</span>
-                    <Badge tone={harmTone(item.harm)}>{item.harm}</Badge>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="layer-stage">
-          <div className="layer-rail">
-            <span className="layer-rail-num">02</span>
-            <span className="layer-rail-label">How it is broken down</span>
-          </div>
-          <div className="layer-body">
-            <div className="layer-split">
-              <div>
-                <div className="layer-split-label">Consumes</div>
-                <div className="defs">
-                  {current.consumes.map((row) => (
-                    <div className="def" key={row.term}>
-                      <div className="def-term">{row.term}</div>
-                      <div className="def-body">{row.body}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <div className="layer-split-label">Produces</div>
-                <div className="defs">
-                  {current.produces.map((row) => (
-                    <div className="def" key={row.term}>
-                      <div className="def-term">{row.term}</div>
-                      <div className="def-body">{row.body}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <Block label="The rule">{current.rule}</Block>
-            <p className="layer-note">{current.ruleNote}</p>
-          </div>
-        </div>
-
-        <div className="layer-stage">
-          <div className="layer-rail">
-            <span className="layer-rail-num">03</span>
-            <span className="layer-rail-label">How we solve it</span>
-          </div>
-          <div className="layer-body">
-            <p className="layer-text">{current.solution}</p>
-            {issues.length > 0 ? (
-              <div className="layer-outcomes">
-                {issues.map((item) => (
-                  <div className="layer-outcome" key={item.n}>
-                    <div className="layer-outcome-head">
-                      <span className="layer-issues-n">#{item.n}</span>
-                      <span className="layer-outcome-solution">{item.solution}</span>
-                      <Badge tone={item.status === 'ADDRESSED' ? 'ok' : 'neutral'}>
-                        {item.status}
-                      </Badge>
-                    </div>
-                    <div className="layer-outcome-evidence">{item.evidence}</div>
-                  </div>
-                ))}
-              </div>
-            ) : null}
-            {current.proof.length > 0 ? (
-              <ul className="layer-proof">
-                {current.proof.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            ) : null}
-            <div className="layer-where">
-              <span className="layer-where-label">Where to see it</span>
-              <span className="layer-where-value">{current.where}</span>
-            </div>
-          </div>
-        </div>
+        {current.kind === 'frame' ? (
+          current.sections.map((section, index) => (
+            <Stage key={section.label} index={index} label={section.label}>
+              {section.body}
+            </Stage>
+          ))
+        ) : (
+          <LayerStages layer={current} issues={issues} />
+        )}
       </div>
     </>
   );
 }
 
 export function AboutLayers() {
-  return <LayerTabs layers={LAYERS} />;
+  return <LayerTabs tabs={TABS} />;
 }
