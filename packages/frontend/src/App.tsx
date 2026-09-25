@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { COVERAGE_TALLY } from './data/coverage';
-import { AS_OF, PORTFOLIO, SKUS, TRANSFERS, VENDORS } from './data/model';
-import { PIPELINE_SOURCES, SCHEMA_TABLES } from './data/pipeline';
+import { PORTFOLIO, SKUS, TRANSFERS, VENDORS } from './data/model';
+import { PIPELINE_SOURCES } from './data/pipeline';
 import { SkuWorkbenchSection } from './sections/SkuWorkbenchSection';
 import { OverviewSection } from './sections/OverviewSection';
 import { MslSection } from './sections/MslSection';
@@ -13,7 +13,6 @@ import { VendorsSection } from './sections/VendorsSection';
 import { PipelineSection } from './sections/PipelineSection';
 import { CoverageSection } from './sections/CoverageSection';
 import { AboutSection } from './sections/AboutSection';
-import { formatDate, formatInt } from './utils/format';
 
 type SectionId =
   | 'sku'
@@ -194,26 +193,6 @@ export function App() {
               })}
             </div>
           ))}
-        </div>
-
-        <div className="rail-foot">
-          <div className="legend">
-            <span className="legend-item">
-              <span className="dot dot-observed" aria-hidden="true" /> observed from EVM systems
-            </span>
-            <span className="legend-item">
-              <span className="dot dot-imported" aria-hidden="true" /> imported via pipeline
-            </span>
-            <span className="legend-item">
-              <span className="dot dot-simulated" aria-hidden="true" /> simulated history
-            </span>
-          </div>
-          <span>
-            Run of <span className="mono">{formatDate(AS_OF)}</span>
-          </span>
-          <span>
-            {formatInt(SCHEMA_TABLES.length)} tables · recommend-only
-          </span>
         </div>
       </nav>
 
