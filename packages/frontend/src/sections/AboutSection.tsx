@@ -3,194 +3,11 @@ import { AS_OF, SKUS, TRANSFERS, VENDORS, VENDOR_COVERED_SKUS } from '../data/mo
 import { COVERAGE_TALLY, LIMITATIONS } from '../data/coverage';
 import { PIPELINE_SOURCES, SCHEMA_TABLES } from '../data/pipeline';
 import { Badge, Callout, Panel, Stat } from '../components/ui';
+import { Block, Fraction, Line, O, Pow, Root, Sub, V } from '../components/math';
+import { AboutLayers } from './AboutLayers';
 import { formatDate, formatInt } from '../utils/format';
 
-/* ---------------------------------------------------------------- math set */
-
-function V({ children }: { children: ReactNode }) {
-  return <span className="math-v">{children}</span>;
-}
-
-function Sub({ children }: { children: ReactNode }) {
-  return <span className="math-sub">{children}</span>;
-}
-
-function Pow({ children }: { children: ReactNode }) {
-  return <span className="math-sup">{children}</span>;
-}
-
-function O({ children }: { children: ReactNode }) {
-  return <span className="math-op">{children}</span>;
-}
-
-function Fraction({ n, d }: { n: ReactNode; d: ReactNode }) {
-  return (
-    <span className="math-frac">
-      <span>{n}</span>
-      <span>{d}</span>
-    </span>
-  );
-}
-
-function Root({ children }: { children: ReactNode }) {
-  return (
-    <span className="math-sqrt">
-      <span className="math-radic">√</span>
-      <span className="math-sqrt-body">{children}</span>
-    </span>
-  );
-}
-
-function Block({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="math-block">
-      <span className="math-label">{label}</span>
-      {children}
-    </div>
-  );
-}
-
-function Line({ children }: { children: ReactNode }) {
-  return <div className="math-line">{children}</div>;
-}
-
 /* ------------------------------------------------------------------- data */
-
-const ENGINES: readonly { engine: string; job: string; rule: ReactNode; where: string }[] = [
-  {
-    engine: 'Dynamic MSL engine',
-    job: 'Derive the minimum level from measured demand instead of a hand-typed monthly plan.',
-    rule: (
-      <>
-        <V>MSL</V>
-        <O>=</O>
-        <V>DRR</V>
-        <Sub>weighted</Sub>
-        <O>×</O>
-        <V>event</V>
-        <O>×</O>
-        <V>LT</V>
-        <Sub>avg</Sub>
-        <O>+</O>
-        <V>SS</V>
-      </>
-    ),
-    where: 'SKU workbench · MSL engine',
-  },
-  {
-    engine: 'Demand intelligence',
-    job: 'Size a buffer against demand and lead-time variance, segment the catalogue, net out returns.',
-    rule: (
-      <>
-        <V>SS</V>
-        <O>=</O>
-        <V>Z</V>
-        <Root>
-          <V>LT</V>
-          <Sub>avg</Sub>
-          <V>σ</V>
-          <Pow>2</Pow>
-          <Sub>d</Sub>
-          <O>+</O>
-          <V>DRR</V>
-          <Pow>2</Pow>
-          <V>σ</V>
-          <Pow>2</Pow>
-          <Sub>LT</Sub>
-        </Root>
-      </>
-    ),
-    where: 'SKU workbench · Demand',
-  },
-  {
-    engine: 'Working capital',
-    job: 'Price the surplus Procura tolerates silently, and catch dead stock and the MOQ trap.',
-    rule: (
-      <>
-        <V>days</V>
-        <O>=</O>
-        <Fraction
-          n={
-            <>
-              <V>surplus units</V>
-            </>
-          }
-          d={
-            <>
-              <V>DRR</V>
-              <Sub>30</Sub>
-            </>
-          }
-        />
-      </>
-    ),
-    where: 'SKU workbench · Working capital',
-  },
-  {
-    engine: 'Transfer intelligence',
-    job: 'Move stock from a surplus site to a deficit site instead of buying more.',
-    rule: (
-      <>
-        <V>qty</V>
-        <O>=</O>
-        <span>min(</span>
-        <V>source</V>
-        <O>−</O>
-        <V>MSL</V>
-        <Sub>source</Sub>
-        <O>×</O>
-        <span>1.10, </span>
-        <V>deficit</V>
-        <O>×</O>
-        <span>1.20)</span>
-      </>
-    ),
-    where: 'SKU workbench · Transfers',
-  },
-  {
-    engine: 'Integration layer',
-    job: 'Get the data in without anyone retyping it, and land it in one schema.',
-    rule: (
-      <>
-        <span>CSV + EasyEcom</span>
-        <O>→</O>
-        <span>{SCHEMA_TABLES.length} tables</span>
-      </>
-    ),
-    where: 'Pipeline',
-  },
-  {
-    engine: 'Dashboard and alerts',
-    job: 'Make all of the above usable by a person under time pressure.',
-    rule: <span>recommend-only · human approval</span>,
-    where: 'This application',
-  },
-  {
-    engine: 'Vendor intelligence',
-    job: 'Benchmark vendors, catch price inflation, and allocate the next order.',
-    rule: (
-      <>
-        <V>score</V>
-        <O>=</O>
-        <span>0.30</span>
-        <V>OTIF</V>
-        <O>+</O>
-        <span>0.25</span>
-        <V>price</V>
-        <O>+</O>
-        <span>0.20</span>
-        <V>LT</V>
-        <O>+</O>
-        <span>0.15</span>
-        <V>quality</V>
-        <O>+</O>
-        <span>0.10</span>
-        <V>resp</V>
-      </>
-    ),
-    where: 'SKU workbench · Vendors',
-  },
-];
 
 const PRINCIPLES: readonly { title: string; body: string }[] = [
   {
@@ -610,36 +427,10 @@ export function AboutSection() {
 
       <Panel
         className="col-12"
-        title="The seven engines"
-        desc="Each row is a shipped, verified module in the shared core, not a proposal."
+        title="The seven layers, in dependency order"
+        desc="Each layer is a shipped module in the shared engine, not a proposal. Every one of them states the problem it removes, how it breaks that problem down, the rule it applies, and what it produced in this run."
       >
-        <div className="table-wrap">
-          <table className="table">
-            <caption className="sr-only">Each engine, its job, the rule it applies and where to see it</caption>
-            <thead>
-              <tr>
-                <th scope="col">Engine</th>
-                <th scope="col">Job</th>
-                <th scope="col">Rule applied</th>
-                <th scope="col">Where to see it</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ENGINES.map((row) => (
-                <tr key={row.engine}>
-                  <th scope="row" style={{ whiteSpace: 'normal', minWidth: 170 }}>
-                    {row.engine}
-                  </th>
-                  <td style={{ whiteSpace: 'normal', minWidth: 230 }}>{row.job}</td>
-                  <td className="math" style={{ whiteSpace: 'normal', minWidth: 220 }}>
-                    {row.rule}
-                  </td>
-                  <td style={{ whiteSpace: 'normal' }}>{row.where}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <AboutLayers />
       </Panel>
 
       <Panel
@@ -679,7 +470,7 @@ export function AboutSection() {
               },
               {
                 title: 'Compute',
-                body: 'The seven engines run on the same set, so the SKU view and the portfolio view cannot disagree.',
+                body: 'The seven layers run on the same set, so the SKU view and the portfolio view cannot disagree.',
               },
               {
                 title: 'Approve',
