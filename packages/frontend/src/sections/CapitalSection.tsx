@@ -166,67 +166,83 @@ export function CapitalSection() {
           </p>
         </Panel>
 
-        <Panel
-          className="col-7"
-          title="Dead and slow-moving stock"
-          desc="Classified purely on sales activity: sales in 30 days means active, 60 means slow moving, 90 means stagnant, none means dead."
-        >
-          <div className="table-wrap">
-            <table className="table">
-              <caption className="sr-only">Stock movement classification and depreciation exposure</caption>
-              <thead>
-                <tr>
-                  <th scope="col">SKU</th>
-                  <th scope="col">Status</th>
-                  <th scope="col" className="right">
-                    30d
-                  </th>
-                  <th scope="col" className="right">
-                    60d
-                  </th>
-                  <th scope="col" className="right">
-                    90d
-                  </th>
-                  <th scope="col">Value</th>
-                  <th scope="col" className="right">
-                    Depreciation / mo
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedDead.map((model) => (
-                  <tr key={model.sku}>
-                    <th scope="row" className="sku">
-                      {model.sku}
+        <div className="col-7 stack">
+          <Panel
+            title="Dead and slow-moving stock"
+            desc="Classified purely on sales activity: sales in 30 days means active, 60 means slow moving, 90 means stagnant, none means dead."
+          >
+            <div className="table-wrap">
+              <table className="table">
+                <caption className="sr-only">Stock movement classification and depreciation exposure</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">SKU</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" className="right">
+                      30d
                     </th>
-                    <td>
-                      <Badge
-                        tone={
-                          model.deadStock.status === 'ACTIVE'
-                            ? 'ok'
-                            : model.deadStock.status === 'SLOW_MOVING'
-                              ? 'watch'
-                              : model.deadStock.status === 'STAGNANT'
-                                ? 'warn'
-                                : 'crit'
-                        }
-                      >
-                        {model.deadStock.status.replace('_', ' ')}
-                      </Badge>
-                    </td>
-                    <td className="right num">{formatInt(model.deadStock.unitsSold30Days)}</td>
-                    <td className="right num">{formatInt(model.deadStock.unitsSold60Days)}</td>
-                    <td className="right num">{formatInt(model.deadStock.unitsSold90Days)}</td>
-                    <td className="num">{formatInrCompact(model.deadStock.inventoryValue)}</td>
-                    <td className="right num">
-                      {formatInrCompact(model.deadStock.estimatedMonthlyDepreciation)}
-                    </td>
+                    <th scope="col" className="right">
+                      60d
+                    </th>
+                    <th scope="col" className="right">
+                      90d
+                    </th>
+                    <th scope="col">Value</th>
+                    <th scope="col" className="right">
+                      Depreciation / mo
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Panel>
+                </thead>
+                <tbody>
+                  {sortedDead.map((model) => (
+                    <tr key={model.sku}>
+                      <th scope="row" className="sku">
+                        {model.sku}
+                      </th>
+                      <td>
+                        <Badge
+                          tone={
+                            model.deadStock.status === 'ACTIVE'
+                              ? 'ok'
+                              : model.deadStock.status === 'SLOW_MOVING'
+                                ? 'watch'
+                                : model.deadStock.status === 'STAGNANT'
+                                  ? 'warn'
+                                  : 'crit'
+                          }
+                        >
+                          {model.deadStock.status.replace('_', ' ')}
+                        </Badge>
+                      </td>
+                      <td className="right num">{formatInt(model.deadStock.unitsSold30Days)}</td>
+                      <td className="right num">{formatInt(model.deadStock.unitsSold60Days)}</td>
+                      <td className="right num">{formatInt(model.deadStock.unitsSold90Days)}</td>
+                      <td className="num">{formatInrCompact(model.deadStock.inventoryValue)}</td>
+                      <td className="right num">
+                        {formatInrCompact(model.deadStock.estimatedMonthlyDepreciation)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Panel>
+
+          <Panel title="What this releases" desc="If the engine's lower levels were adopted.">
+            <div className="stats" style={{ gridTemplateColumns: '1fr 1fr' }}>
+              <Stat
+                label="Releasable value"
+                value={formatInrCompact(PORTFOLIO.releaseableCapital)}
+                sub="from MSL decreases"
+              />
+              <Stat
+                label="Carry avoided"
+                value={formatInrCompact(PORTFOLIO.annualHoldingCost * 0.12)}
+                sub={formatPct(12, 0) + ' of surplus value'}
+              />
+            </div>
+          </Panel>
+        </div>
 
         <div className="col-5 stack">
           <Panel
@@ -304,20 +320,6 @@ export function CapitalSection() {
             )}
           </Panel>
 
-          <Panel title="What this releases" desc="If the engine's lower levels were adopted.">
-            <div className="stats" style={{ gridTemplateColumns: '1fr 1fr' }}>
-              <Stat
-                label="Releasable value"
-                value={formatInrCompact(PORTFOLIO.releaseableCapital)}
-                sub="from MSL decreases"
-              />
-              <Stat
-                label="Carry avoided"
-                value={formatInrCompact(PORTFOLIO.annualHoldingCost * 0.12)}
-                sub={formatPct(12, 0) + ' of surplus value'}
-              />
-            </div>
-          </Panel>
         </div>
       </div>
     </>
