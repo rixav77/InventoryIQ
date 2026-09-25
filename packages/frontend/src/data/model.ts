@@ -24,7 +24,6 @@ import {
   analyzeMoqTrap,
   analyzeVendorConcentration,
   analyzeWarehouseSurplusDeficit,
-  calculateClassDrivenSafetyStock,
   calculateCapitalRisk,
   calculateDemandProfile,
   calculateDrrStability,
@@ -203,6 +202,12 @@ function buildSkuModel(seed: (typeof EVM_SKU_SEEDS)[number]): SkuModel {
     dailySales: sales,
     asOfDate: AS_OF,
     eventMultiplier: 1,
+    /*
+     * The service level this SKU was graded into. Without it the engine falls
+     * back to a flat 1.65, so an AX row carrying the revenue core would be
+     * buffered at 95% while its own classification asks for 99%.
+     */
+    serviceLevelZ: classification.zScore,
     leadTimeSamples,
     currentStock: seed.currentPhysicalStock,
     openPurchaseOrders: seed.openPurchaseOrders,
@@ -217,14 +222,6 @@ function buildSkuModel(seed: (typeof EVM_SKU_SEEDS)[number]): SkuModel {
   });
 
   const profile = calculateDemandProfile(sales, AS_OF);
-  const safety = calculateClassDrivenSafetyStock({
-    combinedClass: classification.combinedClass,
-    currentSafetyStock: seed.evmSafetyStock,
-    sales,
-    asOfDate: AS_OF,
-    averageDailyRunRate: profile.drr30,
-    leadTimeSamples,
-  });
   const netDemand = calculateNetDemandMetrics({
     sales: mergedChannelSales(seed.sku),
     asOfDate: AS_OF,
@@ -334,9 +331,14 @@ function buildSkuModel(seed: (typeof EVM_SKU_SEEDS)[number]): SkuModel {
     leadTimeStdDev: dynamic.leadTime.leadTimeStandardDeviationDays,
     eventMultiplier: dynamic.drr.eventMultiplier,
     classification,
-    safetyStockCurrent: safety.currentSafetyStock,
-    safetyStockRecommended: safety.recommendedSafetyStock,
-    demandStdDev: safety.demandStandardDeviation,
+    safetyStockCurrent: seed.evmSafetyStock,
+    /*
+     * One buffer per SKU. The engine sized this at the class service level and
+     * already added it to the level, so the demand surface reports that same
+     * number instead of a second one built from a different run rate.
+     */
+    safetyStockRecommended: Math.ceil(dynamic.safetyStock),
+    demandStdDev: dynamic.demandStandardDeviation,
     volatility: profile.volatility,
     trend: profile.trend,
     trendPercent: profile.trendPercent,
