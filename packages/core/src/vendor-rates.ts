@@ -157,7 +157,7 @@ export function compareVendorRates(
 
   if (spreadPercent > PRICE_SPREAD_ALERT_PERCENT) {
     alerts.push(
-      `Price disparity ${spreadPercent.toFixed(1)}% across vendors for ${sku} — investigate.`,
+      `Price disparity ${spreadPercent.toFixed(1)}% across vendors for ${sku}. Investigate.`,
     );
   }
   for (const vendor of vendors) {

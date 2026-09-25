@@ -217,10 +217,11 @@ When you finish code:
 * **Implementation Commit:** `6e484d8`
 * **Deliverables:**
   * React + Vite dashboard consuming the live `@inventoryiq/core` engine source: `packages/frontend/`
-  * MSL health overview table with static vs dynamic MSL, action, and band columns: `packages/frontend/src/components/SkuTable.tsx`
-  * SKU deep dive with DRR line chart and static-vs-dynamic MSL bar chart (Recharts): `packages/frontend/src/components/SkuDeepDive.tsx`
-  * Approve / Dismiss recommendation workflow: `packages/frontend/src/components/RecommendationList.tsx`
-  * Deterministic data layer (static MSL, dynamic MSL, safety stock, surplus capital): `packages/frontend/src/data/dashboard-data.ts`
+  * Ten-section shell (Per SKU · Portfolio · Operations · Reference) built around a per-SKU dossier: `packages/frontend/src/App.tsx`
+  * Section views: workbench, overview, MSL, demand, capital, transfers, vendors, pipeline, limitations, about: `packages/frontend/src/sections/`
+  * Deterministic data layer over the verified core seeds: `packages/frontend/src/data/`
+  * Shared search, panel, badge, meter and empty-state primitives: `packages/frontend/src/components/`
+  * Design tokens and application stylesheet, including the mathematical typesetting used on the About page: `packages/frontend/src/styles/`
   * Vite resolver plugin mapping the engine's NodeNext `.js` specifiers to `.ts` source: `packages/frontend/vite.config.ts`
 * **Verification Commands:**
   * `npm run typecheck`
@@ -235,7 +236,7 @@ When you finish code:
   * `npm run verify:chunk-3`
   * `npm run verify:chunk-4`
   * `npm run verify:chunk-5`
-* **Verification Result:** `tsc --noEmit` and `vite build` both pass; the dashboard bundles the engine (Chunks 1-5) and renders the 8-SKU MSL comparison. Prototype scope only: WhatsApp/email alerts, auth, sale-event calendar, and Procura write-back are deferred to V1. Styling uses hand-written CSS rather than TailwindCSS to avoid an additional build dependency in the prototype.
+* **Verification Result:** `tsc --noEmit` and `vite build` both pass; the dashboard bundles the engine (Chunks 1-7) and renders the 8-SKU MSL comparison. Prototype scope only: WhatsApp/email alerts, auth, sale-event calendar, and Procura write-back are deferred to V1. Styling uses hand-written CSS rather than TailwindCSS to avoid an additional build dependency in the prototype. The flat MSL table from the first pass was superseded on 25 Sep 2026 by the ten-section shell above, which surfaces every chunk (MSL, demand, capital, transfers, vendors, pipeline, limitations); the Limitations ledger and About page document the baseline problems and the rules that answer them.
 
 ---
 

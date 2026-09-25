@@ -2,3 +2,4 @@
 .commandcode/
 node_modules/
 *.log
+.code-review-graph/

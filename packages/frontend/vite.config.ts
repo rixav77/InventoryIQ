@@ -1,29 +1,41 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import type { Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// The shared engine (@inventoryiq/core) is authored as TypeScript with NodeNext
-// ".js" specifiers that point at ".ts" files. Vite does not rewrite those by
-// default, so resolve them here and let the dashboard consume the live source.
+// The shared engine is consumed as live TypeScript source rather than a built
+// artifact, so two things need help in dev:
+//   1. the bare specifier routes to an in-app shim whose relative import keeps
+//      Vite's dependency optimizer out of the engine, and
+//   2. the engine's NodeNext ".js" specifiers point at ".ts" files, which Vite
+//      does not rewrite on its own.
+const coreShim = fileURLToPath(new URL('./src/engine.ts', import.meta.url));
+
 function resolveTsFromJs(): Plugin {
   return {
     name: 'inventoryiq-resolve-ts-from-js',
     enforce: 'pre',
     async resolveId(source, importer, options) {
-      if (importer !== undefined && source.startsWith('.') && source.endsWith('.js')) {
-        const asTs = `${source.slice(0, -3)}.ts`;
-        const resolved = await this.resolve(asTs, importer, { ...options, skipSelf: true });
-        if (resolved !== null) {
-          return resolved;
-        }
+      // Only project source. Pre-bundled dependencies under node_modules import
+      // each other with real ".js" files that must be left alone.
+      if (importer === undefined || importer.includes('/node_modules/')) {
+        return null;
       }
-      return null;
+      if (!source.startsWith('.') || !source.endsWith('.js')) {
+        return null;
+      }
+      const asTs = `${source.slice(0, -3)}.ts`;
+      const resolved = await this.resolve(asTs, importer, { ...options, skipSelf: true });
+      return resolved === null ? null : resolved;
     },
   };
 }
 
 export default defineConfig({
   plugins: [resolveTsFromJs(), react()],
+  resolve: {
+    alias: [{ find: '@inventoryiq/core', replacement: coreShim }],
+  },
   optimizeDeps: {
     exclude: ['@inventoryiq/core'],
   },
