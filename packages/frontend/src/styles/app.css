@@ -101,9 +101,22 @@ button {
 
 .rail-brand {
   display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 6px;
+}
+
+.rail-logo {
+  flex: none;
+  display: block;
+  border-radius: 7px;
+}
+
+.rail-brand-text {
+  display: flex;
   flex-direction: column;
   gap: 3px;
-  padding: 0 6px;
+  min-width: 0;
 }
 
 .rail-mark {

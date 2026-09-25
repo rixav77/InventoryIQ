@@ -160,10 +160,13 @@ export function App() {
 
       <nav className="rail" aria-label="Sections">
         <div className="rail-brand">
-          <span className="rail-mark">
-            Inventory<span className="iq">IQ</span>
+          <img className="rail-logo" src="/iq.svg" alt="" width={26} height={26} />
+          <span className="rail-brand-text">
+            <span className="rail-mark">
+              Inventory<span className="iq">IQ</span>
+            </span>
+            <span className="rail-by">Axiom Labs × EVM Zone</span>
           </span>
-          <span className="rail-by">Axiom Labs × EVM Zone</span>
         </div>
 
         <div className="rail-nav">
