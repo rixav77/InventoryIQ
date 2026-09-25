@@ -540,12 +540,12 @@ const LAYERS: readonly Layer[] = [
 
 /* ------------------------------------------------------------------ frames */
 
-const PROBLEM_TAB: Frame = {
+const FRAME: Frame = {
   kind: 'frame',
-  id: 'problem',
-  label: 'The problem',
-  name: 'Assumptions where measurement belongs',
-  headline: 'Three inputs drive the level, and one of them is guesswork.',
+  id: 'frame',
+  label: 'Before and after',
+  name: 'The assumption, and what replaces it',
+  headline: 'Three inputs drive the level in Procura, and one of them is guesswork. Each is replaced by something the business already measures.',
   sections: [
     {
       label: 'What Procura computes',
@@ -628,16 +628,6 @@ const PROBLEM_TAB: Frame = {
         </Callout>
       ),
     },
-  ],
-};
-
-const FIX_TAB: Frame = {
-  kind: 'frame',
-  id: 'fix',
-  label: 'The fix',
-  name: 'Measure instead of assume',
-  headline: 'Each guessed input is replaced by something computed from history.',
-  sections: [
     {
       label: 'The replacement arithmetic',
       body: (
@@ -781,7 +771,7 @@ const FIX_TAB: Frame = {
 
 /* ------------------------------------------------------------------- tabs */
 
-const TABS: readonly Tab[] = [PROBLEM_TAB, FIX_TAB, ...LAYERS];
+const TABS: readonly Tab[] = [FRAME, ...LAYERS];
 
 /* --------------------------------------------------------------- component */
 

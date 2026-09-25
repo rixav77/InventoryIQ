@@ -231,8 +231,8 @@ export function AboutSection() {
 
       <Panel
         className="col-12"
-        title="The problem, the fix, then layer by layer"
-        desc="The first two tabs carry the before and after of the core arithmetic, which Procura shares across every SKU. The seven that follow are the shipped modules, in the order they depend on each other, each stating the problem it removes, how it breaks that problem down and what it produced in this run."
+        title="How the engine works, layer by layer"
+        desc="The first tab carries the before and after of the core arithmetic, which Procura shares across every SKU. The seven that follow are the shipped modules, in the order they depend on each other, each stating the problem it removes, how it breaks that problem down and what it produced in this run."
       >
         <AboutLayers />
       </Panel>
